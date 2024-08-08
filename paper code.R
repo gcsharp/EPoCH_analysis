@@ -2,13 +2,15 @@
 
 dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/rds/all_results_reduced.rds")
 
-#summarising sample sizes
+# Summarising sample sizes
 unstrat <-dat[-grep(dat$model_new_name,pattern="stratified"),]
 aggregate(unstrat$total_n, list(unstrat$cohorts_n), FUN=summary)
 aggregate(unstrat$total_n, list(unstrat$cohorts_n), FUN=length)
 summary(unstrat$total_n)
 
-#summarising sample characteristics 
+# Summarising sample characteristics 
+
+## Function to make cohort summaries
 make_cohort_summary <- function(VAR_b_s,VAR_o_s,VAR_o_a,VAR_b_a,VAR_o_c,VAR_b_c,VAR_to_s,VAR_to_a,VAR_to_c,VAR_tb_s,VAR_tb_a,VAR_tb_c,VAR_passive,VAR_passive_t, VAR_binge_t,VAR_binge,VAR_educ_t,VAR_educ,VAR_occup_t,VAR_occup,cohortname){
 as_b <- aggregate(VAR_b_s, list(unstrat$person_exposed[unstrat$exposure_subclass=="active smoking"&unstrat$exposure_type=="binary"],
                                 unstrat$exposure_time[unstrat$exposure_subclass=="active smoking"&unstrat$exposure_type=="binary"]), FUN=max,na.rm=T)
@@ -203,456 +205,272 @@ VAR_occup <- unstrat$total_n_exposure[unstrat$exposure_subclass=="low SEP (occup
 
 total_summary <- make_cohort_summary(VAR_b_s,VAR_o_s,VAR_o_a,VAR_b_a,VAR_o_c,VAR_b_c,VAR_to_s,VAR_to_a,VAR_to_c,VAR_tb_s,VAR_tb_a,VAR_tb_c,VAR_passive,VAR_passive_t, VAR_binge_t,VAR_binge,VAR_educ_t,VAR_educ,VAR_occup_t,VAR_occup,"Total")
 
-## combine
+## Combine and change to wide format
 all_cohort_summaries <- rbind(alspac_summary,bib_summary,mcs_summary,moba_summary,total_summary)
 all_cohort_summaries$exposure_dose <- paste0(all_cohort_summaries$exposure," (",all_cohort_summaries$dose,")")
 all_cohort_summaries$value <- paste0(all_cohort_summaries$max_exposed,"/",all_cohort_summaries$max,
        " (",all_cohort_summaries$percent_exposed,"%)")
 all_cohort_summaries$parent_time <- paste0(all_cohort_summaries$parent,": ",all_cohort_summaries$time)
 
+require(tidyverse)
 WIDE <- all_cohort_summaries[,c("cohort","exposure_dose","parent","time","value")] %>%
 pivot_wider(names_from = c(parent), values_from = c(value))
+
+## Save
 
 write.csv(all_cohort_summaries,file="cohort_summaries_n_long.csv")
 write.csv(WIDE,file="cohort_summaries_n.csv")
 
-#comparing maternal and paternal effect sizes for model 2a and 2b, separately for HBs and SEP
-HBs <- c("smoking","alcohol consumption","caffeine consumption")
+# Summarising effect sizes and p-values
+
+## adding info to unstrat
+
+unstrat$est_SDM <- unstrat$est
+unstrat$est_SDM[unstrat$outcome_type=="binary"]<-unstrat$est[unstrat$outcome_type=="binary"]*0.5513
+
+unstrat$hit_category <- NA
+unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr<0.05]<-"abs(effect)>0.2 & FDR-adj P<0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr<0.05]<-"abs(effect)<0.2 & FDR-adj P<0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr>0.05]<-"abs(effect)<0.2 & FDR-adj P>0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr>0.05]<-"abs(effect)>0.2 & FDR-adj P>0.05"
+unstrat$hit_category <- factor(unstrat$hit_category,ordered=T,levels=c("abs(effect)<0.2 & FDR-adj P>0.05","abs(effect)>0.2 & FDR-adj P>0.05","abs(effect)<0.2 & FDR-adj P<0.05","abs(effect)>0.2 & FDR-adj P<0.05"))
+
+unstrat$person_exposed2 <- NA
+unstrat$person_exposed2[unstrat$person_exposed=="mother"]<-"M"
+unstrat$person_exposed2[unstrat$person_exposed=="partner"]<-"P"
+
+unstrat$exposure_time2 <- NA
+unstrat$exposure_time2[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("early onset")]<-"<12y"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever in\npregnancy"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("preconception")]<-"Before\npregnancy"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in life")]<-"Ever in\nlife"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("at study recruitment")]<-""
+unstrat$exposure_time2[unstrat$exposure_time %in% c("first trimester")]<-"First\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("second trimester")]<-"Second\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("third trimester")]<-"Third\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("first two postnatal years")]<-"After\npregnancy"
+unstrat$exposure_time2 <- factor(unstrat$exposure_time2,ordered=T,levels=c("GRS","<12y","Ever in\nlife","Before\npregnancy","Ever in\npregnancy","First\ntrimester","Second\ntrimester","Third\ntrimester","After\npregnancy",""))
+
+unstrat$exposure_time3 <- NA
+unstrat$exposure_time3[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("early onset")]<-"<12y"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever preg"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("preconception")]<-"Before preg"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in life")]<-"Ever life"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("at study recruitment")]<-"Low SEP"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("first trimester")]<-"First trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("second trimester")]<-"Second trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("third trimester")]<-"Third trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("first two postnatal years")]<-"After preg"
+unstrat$exposure_time3 <- factor(unstrat$exposure_time3,ordered=T,levels=c("GRS","<12y","Ever life","Before preg","Ever preg","First trim","Second trim","Third trim","After preg","Low SEP"))
+
+unstrat$exposure_class2 <- NA
+unstrat$exposure_class2[unstrat$exposure_class=="smoking"]<-"Smoking"
+unstrat$exposure_class2[unstrat$exposure_class=="alcohol consumption"]<-"Alcohol consumption"
+unstrat$exposure_class2[unstrat$exposure_class=="caffeine consumption"]<-"Caffeine consumption"
+unstrat$exposure_class2[unstrat$exposure_class=="low socioeconomic position"]<-"Low SEP"
+unstrat$exposure_class2<- factor(unstrat$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
+
+## summarising hits by exposure time
+
+df <- droplevels(unstrat[unstrat$model=="model2b",])
+require(ggh4x)
+ggplot(df,aes(x=person_exposed2,fill=hit_category))+
+  geom_bar(position="fill")+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(.~exposure_class2+exposure_time2,space="free",scales="free")+
+  xlab("Exposed parent")+ylab("Proportion of results")+
+  theme_classic()+
+  theme(strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
+        legend.position="bottom",legend.title=element_blank())
+
+# summarising hits  by model (supplementary material)
+
+## distribution of effect estimates and p-values for mothers and partners
+
+calculate_hit_counts <- function(model,dat){
+  D <- dat[dat$model == model,]
+  
+  Counts <- c(
+    "abs(effect)<0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P>0.05"]),
+    "abs(effect)>0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P>0.05"]),
+    "abs(effect)<0.2 & FDR-adj P<0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P<0.05"]),
+    "abs(effect)>0.2 & FDR-adj P<0.05" =  length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P<0.05"]),
+    "abs(effect)<0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P>0.05"&D$person_exposed=="mother"]),
+    "abs(effect)>0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P>0.05"&D$person_exposed=="mother"]),
+    "abs(effect)<0.2 & FDR-adj P<0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P<0.05"&D$person_exposed=="mother"]),
+    "abs(effect)>0.2 & FDR-adj P<0.05" =  length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P<0.05"&D$person_exposed=="mother"]),
+    "abs(effect)<0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P>0.05"&D$person_exposed=="partner"]),
+    "abs(effect)>0.2 & FDR-adj P>0.05" = length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P>0.05"&D$person_exposed=="partner"]),
+    "abs(effect)<0.2 & FDR-adj P<0.05" = length(D$hit_category[D$hit_category=="abs(effect)<0.2 & FDR-adj P<0.05"&D$person_exposed=="partner"]),
+    "abs(effect)>0.2 & FDR-adj P<0.05" =  length(D$hit_category[D$hit_category=="abs(effect)>0.2 & FDR-adj P<0.05"&D$person_exposed=="partner"]))
+  Proportions <- c(Counts[1]/sum(Counts[1:4],na.rm=T),Counts[2]/sum(Counts[1:4],na.rm=T),Counts[3]/sum(Counts[1:4],na.rm=T),Counts[4]/sum(Counts[1:4],na.rm=T),
+                   Counts[5]/sum(Counts[5:8],na.rm=T),Counts[6]/sum(Counts[5:8],na.rm=T),Counts[7]/sum(Counts[5:8],na.rm=T),Counts[8]/sum(Counts[5:8],na.rm=T),
+                   Counts[9]/sum(Counts[9:12],na.rm=T),Counts[10]/sum(Counts[9:12],na.rm=T),Counts[11]/sum(Counts[9:12],na.rm=T),Counts[12]/sum(Counts[9:12],na.rm=T))
+  DF <- data.frame(category=names(Counts),
+                   counts=Counts,
+                   proportions=Proportions,
+                   model=model,
+                   parent=c(rep("Either",4),rep("Mother",4),rep("Partner",4)))
+  DF
+}
+
+models = unique(unstrat$model)
+exposureclasses=unique(unstrat$exposure_class)
+exposuretimes=unique(unstrat$exposure_time)
+outcomeclasses=unique(unstrat$outcome_class)
+
+res <- lapply(exposureclasses,function(x){
+  res <- lapply(models,calculate_hit_counts,dat=unstrat[unstrat$exposure_class==x,])
+  res <- bind_rows(res)
+  row.names(res)<-NULL
+  res$exposure_class<-x
+  res
+})
+res <- bind_rows(res)
+
+res$category <- factor(res$category,ordered=T,levels=c("abs(effect)<0.2 & FDR-adj P>0.05","abs(effect)>0.2 & FDR-adj P>0.05","abs(effect)<0.2 & FDR-adj P<0.05","abs(effect)>0.2 & FDR-adj P<0.05"))
+
+res$exposure_class2 <- NA
+res$exposure_class2[res$exposure_class=="smoking"]<-"Smoking"
+res$exposure_class2[res$exposure_class=="alcohol consumption"]<-"Alcohol consumption"
+res$exposure_class2[res$exposure_class=="caffeine consumption"]<-"Caffeine consumption"
+res$exposure_class2[res$exposure_class=="low socioeconomic position"]<-"Low SEP"
+res$exposure_class2<- factor(res$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
+
+ggplot(res,aes(x=parent,y=counts,fill=category))+
+  geom_col(position="fill")+
+  facet_grid(exposure_class~model,space="free",scales="free")+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  xlab("Exposed parent")+ylab("Proportion of results")+
+  theme_classic()+
+  theme(strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
+        legend.position="bottom",legend.title=element_blank())
+
+## Text for main body:
+res %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
+res[res$model=="model2b",] %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
+res[res$model=="model2b"&res$parent=="Either",] %>% group_by(category,exposure_class,parent) %>% summarise(mean(proportions,na.rm=T))
+prop.table(table(unstrat$hit_category[unstrat$model=="model2b"&unstrat$exposure_time3=="GRS"]))
+
+# Creating MatPat (df containing maternal and corresponding paternal analysis in wide format)
+
 mat <- unstrat[unstrat$person_exposed=="mother",]
 pat <- unstrat[unstrat$person_exposed=="partner",]
-matpat <- merge(mat,pat,by=c("exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_linker","model"),all=T,suffixes = c("mat","pat"))
+matpat <- merge(mat,pat,by=c("exposure_class2","exposure_subclass","exposure_time2","exposure_type","exposure_dose","outcome_linker","model"),all=T,suffixes = c("mat","pat"))
 matpat$samedir <- sign(matpat$estmat)==sign(matpat$estpat)
-prop.table(table(matpat$samedir[matpat$model=="model2a"&matpat$exposure_class%in%HBs])) #64% in same direction
-prop.table(table(matpat$samedir[matpat$model=="model2b"&matpat$exposure_class%in%HBs])) #59% in same direction
-prop.table(table(matpat$samedir[matpat$model=="model2a"&matpat$exposure_class=="low socioeconomic position"])) #83% in same direction
-prop.table(table(matpat$samedir[matpat$model=="model2b"&matpat$exposure_class=="low socioeconomic position"])) #80% in same direction
 matpat$samedir_diff <- abs(matpat$estmat) - abs(matpat$estpat)
 matpat$samedir_diff[matpat$samedir==F]<-NA
-prop.table(table(sign(matpat$samedir_diff[matpat$model=="model2a"&matpat$exposure_class%in%HBs]))) #48% mat>pat, 52% pat>mat
-prop.table(table(sign(matpat$samedir_diff[matpat$model=="model2b"&matpat$exposure_class%in%HBs]))) #54% mat>pat, 46% pat>mat
-prop.table(table(sign(matpat$samedir_diff[matpat$model=="model2a"&matpat$exposure_class=="low socioeconomic position"]))) #66% mat>pat, 34% pat>mat
-prop.table(table(sign(matpat$samedir_diff[matpat$model=="model2b"&matpat$exposure_class=="low socioeconomic position"]))) #72% mat>pat, 28% pat>mat
-
 matpat$samedir_pc_change <- (abs(matpat$samedir_diff)/abs(matpat$estmat))*100
-summary(matpat$samedir_pc_change[matpat$samedir_diff<0&matpat$model=="model2a"&matpat$exposure_class%in%HBs])#P = median 124% > than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff>0&matpat$model=="model2a"&matpat$exposure_class%in%HBs])#P = median 51% < than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff<0&matpat$model=="model2b"&matpat$exposure_class%in%HBs])#P = median 143% > than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff>0&matpat$model=="model2b"&matpat$exposure_class%in%HBs])#P = median 57% < than M
 
-summary(matpat$samedir_pc_change[matpat$samedir_diff<0&matpat$model=="model2a"&matpat$exposure_class=="low socioeconomic position"])#P = median 45% > than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff>0&matpat$model=="model2a"&matpat$exposure_class=="low socioeconomic position"])#P = median 29% < than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff<0&matpat$model=="model2b"&matpat$exposure_class=="low socioeconomic position"])#P = median 59% > than M
-summary(matpat$samedir_pc_change[matpat$samedir_diff>0&matpat$model=="model2b"&matpat$exposure_class=="low socioeconomic position"])#P = median 43% < than M
+# Correlating maternal and paternal effects
 
-##continuous
-ggmatpat <- matpat[matpat$model=="model2b"&matpat$outcome_typemat=="continuous",]
-ggmatpat <- ggmatpat[order(ggmatpat$estmat),]
-ggmatpat$exposure_class <- factor(ggmatpat$exposure_class,ordered=T,levels=c("smoking","alcohol consumption","caffeine consumption","low socioeconomic position"))
-require(ggplot2)
-ggplot(ggmatpat,aes(y=1:nrow(ggmatpat)))+
-  geom_point(aes(x=estpat),colour="cornflowerblue",alpha=0.5)+
-  geom_vline(xintercept=0)+
-  geom_point(aes(x=estmat),colour="darkred",alpha=0.5)+
+df <- droplevels(matpat[matpat$model=="model2b",])
+df <- droplevels(df[-which(is.na(df$est_SDMmat)|is.na(df$est_SDMpat)),])
+
+require(tidymodels)
+
+gen_scatter_plot <- function(class_time){
+  Class <- unlist(lapply(strsplit(class_time,split="SPLIT"),"[",1))
+  Time <- unlist(lapply(strsplit(class_time,split="SPLIT"),"[",2))
+  Colour <- NA
+  if(Class=="Smoking"){Colour <-"#1b9e77"}
+  if(Class=="Alcohol consumption"){Colour <-"#d95f02"}
+  if(Class=="Caffeine consumption"){Colour <-"#7570b3"}
+  if(Class=="Low SEP"){Colour <-"#e7298a"}
+  df2 <- df[df$exposure_class2==Class&df$exposure_time3mat==Time,]
+  if(Class=="Low SEP"){ df2 <- df[df$exposure_class2==Class,]}
+  Title <- paste0(Class,"\n",Time)
+  if(Class=="Low SEP"){Title <- paste0("Low SEP","\n"," ")}
+P <- ggplot(df2,aes(x=est_SDMmat,y=est_SDMpat))+
+  geom_abline(slope=1,intercept=0,colour="grey80",linetype="dashed")+
+  geom_point(alpha=0.1,colour=Colour)+
+  geom_smooth(method='lm',se=F,linewidth=0.5,colour=Colour)+
+  scale_color_brewer(palette = "Dark2")+
+#  facet_wrap(.~exposure_time2,drop = T,scales="free",nrow=1)+
+  coord_obs_pred()+
   theme_classic()+
-  facet_wrap(exposure_class~.)+
-  theme(axis.text.y=element_blank())+ylab("Outcomes\n(ordered by maternal effect estimate)")+
-  xlab("Effect estimate\n(standardised mean difference)")
+#  xlim(c(-2,2))+ylim(c(-2,2))+
+  xlab("Mothers")+ylab("Partners")+
+  theme(strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
+        legend.position="none",aspect.ratio = 1,plot.title = element_text(hjust = 0.5,size=8),axis.title = element_text(size=8),
+        plot.margin = unit(c(0,0.2,0,1), 'lines'),axis.text=element_text(size=4))+
+  ggtitle(Title)
+P
+}
 
-ggmatpat_ridges <- data.frame(est=c(ggmatpat$estmat,ggmatpat$estpat),
-                              parent=c(rep("mother",nrow(ggmatpat)),rep("partner",nrow(ggmatpat))),
-                              exposure_class=c(ggmatpat$exposure_class,ggmatpat$exposure_class))
-require(ggridges)
-ggplot(ggmatpat_ridges)+
-  geom_density_ridges(aes(x=est,y=parent,fill=parent),alpha=0.5,scale=1)+
-  facet_wrap(exposure_class~.)+
-  scale_fill_manual(values = c("darkred", "cornflowerblue"))+
-  theme_classic()+ylab("")+xlab("Effect estimate\n(standardised mean difference)")+
-  theme(legend.position = "null")+
-  scale_y_discrete(expand=c(0.1,0))
+df$class_time <- paste0(df$exposure_class2,"SPLIT",df$exposure_time3mat)
+Plots <- lapply(c(unique(df$class_time)[1:10],unique(df$class_time)[10:19]),gen_scatter_plot)
+Plots[[10]]<- Plots[[10]]+theme_void()+theme(plot.title=element_blank(),legend.position = "none")+  geom_rect(xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf,fill="white",colour="white")
 
-## binary
-ggmatpat <- matpat[matpat$model=="model2b"&matpat$outcome_typemat=="binary",]
-ggmatpat <- ggmatpat[order(ggmatpat$estmat),]
-ggmatpat$exposure_class <- factor(ggmatpat$exposure_class,ordered=T,levels=c("smoking","alcohol consumption","caffeine consumption","low socioeconomic position"))
-require(ggplot2)
-ggplot(ggmatpat,aes(y=1:nrow(ggmatpat)))+
-  geom_point(aes(x=estpat),colour="cornflowerblue",alpha=0.5)+
-  geom_vline(xintercept=1)+
-  geom_point(aes(x=estmat),colour="darkred",alpha=0.5)+
-  theme_classic()+
-  facet_wrap(exposure_class~.)+
-  theme(axis.text.y=element_blank())+ylab("Outcomes\n(ordered by maternal effect estimate)")+
-  xlab("Effect estimate\n(log odds ratio)")
+require(ggpubr)
 
-ggmatpat_ridges <- data.frame(est=c(ggmatpat$estmat,ggmatpat$estpat),
-                              parent=c(rep("mother",nrow(ggmatpat)),rep("partner",nrow(ggmatpat))),
-                              exposure_class=c(ggmatpat$exposure_class,ggmatpat$exposure_class))
-ggplot(ggmatpat_ridges)+
-  geom_density_ridges(aes(x=est,y=parent,fill=parent),alpha=0.5,scale=1)+
-  facet_wrap(exposure_class~.)+
-  scale_fill_manual(values = c("darkred", "cornflowerblue"))+
-  theme_classic()+ylab("")+xlab("Effect estimate\n(log odds ratio)")+
-  theme(legend.position = "null")+
-  scale_y_discrete(expand=c(0.1,0))
+Plots <- ggarrange(plotlist=Plots, ncol = 10, nrow=2,align="v")
+Plots
 
-#small effect sizes
-summary(abs(matpat$estmat[matpat$model=="model2b"&matpat$outcome_typemat=="continuous"&matpat$exposure_class%in%HBs]))#min 1e-07., max 1.23, median 0.06
-summary(abs(matpat$estpat[matpat$model=="model2b"&matpat$outcome_typemat=="continuous"&matpat$exposure_class%in%HBs]))#min 1e-07., max 1.45, median 0.06
-summary(exp(abs(matpat$estmat[matpat$model=="model2b"&matpat$outcome_typemat=="binary"&matpat$exposure_class%in%HBs])))#min 1, max 17.9, median 1.16
-summary(exp(abs(matpat$estpat[matpat$model=="model2b"&matpat$outcome_typemat=="binary"&matpat$exposure_class%in%HBs])))#min 1, max 10.6, median 1.16
+df$class_time <- paste0(df$exposure_class2,"SPLIT",df$exposure_time2)
+library(dplyr)
+correlation_by_group <- df %>%
+  group_by(class_time) %>%
+  summarise(correlation = cor(est_SDMmat, est_SDMpat))
+correlation_by_group$class <- unlist(lapply(strsplit(correlation_by_group$class_time,split="SPLIT"),"[",1))
+correlation_by_group$time <- unlist(lapply(strsplit(correlation_by_group$class_time,split="SPLIT"),"[",2))
+correlation_by_group$class_time<-NULL
+correlation_by_group$time[is.na(correlation_by_group$time)]<-""
+require(reshape2)
+df_corr <- dcast(correlation_by_group, time~class,value.var = 'correlation')
+row.names(df_corr)<-df_corr$time
+df_corr$time <- NULL
+df_corr <- as.matrix(df_corr)
+require(corrplot)
+corrplot(df_corr,is.corr = F,method = "color",tl.col = "grey30",tl.cex = 1)
 
-summary(abs(matpat$estmat[matpat$model=="model2b"&matpat$outcome_typemat=="continuous"&matpat$exposure_class=="low socioeconomic position"]))#min 0.002, max 0.66, median 0.10
-summary(abs(matpat$estpat[matpat$model=="model2b"&matpat$outcome_typemat=="continuous"&matpat$exposure_class=="low socioeconomic position"]))#min 0.0003., max 0.5, median 0.09
-summary(exp(abs(matpat$estmat[matpat$model=="model2b"&matpat$outcome_typemat=="binary"&matpat$exposure_class=="low socioeconomic position"])))#min 1.001, max 4.6, median 1.26
-summary(exp(abs(matpat$estpat[matpat$model=="model2b"&matpat$outcome_typemat=="binary"&matpat$exposure_class=="low socioeconomic position"])))#min 1.002., max 4.8, median 1.17
-
-
-#Large P
-prop.table(table(matpat$fdrmat[matpat$model=="model2b"&matpat$exposure_class%in%HBs]<0.05)) #17%
-prop.table(table(matpat$fdrpat[matpat$model=="model2b"&matpat$exposure_class%in%HBs]<0.05)) #12%
-n_hits <- aggregate(dat$fdr, list(paste(dat$model_new_name,dat$person_exposed,dat$exposure_class)), FUN=function(x){sum(x<0.05)})
-names(n_hits) <- c("model","hits")
-tmp <- aggregate(dat$fdr, list(paste(dat$model_new_name,dat$person_exposed,dat$exposure_class)), FUN=function(x){sum(x<1)})
-n_hits$total <-tmp$x
-n_hits$pc <- (n_hits$hits/n_hits$total)*100
-n_hits$mutual_adjustment <-"Not adjusted for co-parent"
-n_hits$mutual_adjustment[grep("with co-parent",n_hits$model)]<-"Adjusted for co-parent"
-n_hits$adj_set <-"Minimal"
-n_hits$adj_set[grep("Standard",n_hits$model)]<-"Standard"
-n_hits$timing <-NA
-n_hits$timing[grep("timepoint",n_hits$model)]<-"Plus previous timepoint(s)"
-n_hits$mediators <-NA
-n_hits$mediators[grep("mediators|child's GRS",n_hits$model)]<-"Plus potential mediators"
-n_hits$grs <-"Observational"
-n_hits$grs[grep("GRS",n_hits$model)]<-"GRS"
-n_hits$person <-"mother"
-n_hits$person[grep("partner",n_hits$model)]<-"partner"
-n_hits$exposure<-"smoking"
-n_hits$exposure[grep("alcohol",n_hits$model)]<-"alcohol consumption"
-n_hits$exposure[grep("caffeine",n_hits$model)]<-"caffeine consumption"
-n_hits$exposure[grep("socio",n_hits$model)]<-"low socioeconomic position"
-
-ggplot(n_hits[-grep(n_hits$model,pattern="stratified"),],aes(x=pc,y=paste(grs,adj_set,timing,mediators),fill=mutual_adjustment))+
-         geom_col(position=position_dodge(0.8),width=0.7)+
-  geom_text(aes(x=pc+4,label=hits),size=3,position=position_dodge(0.8))+
-  facet_grid(person~exposure)
-
-#qq plot
-ggplot(ggmatpat)+
-  stat_qq(aes(sample=-log10(pmat)),colour="darkred") + stat_qq_line(aes(sample=-log10(pmat)),colour="darkred")+
-  stat_qq(aes(sample=-log10(ppat)),colour="cornflowerblue") + stat_qq_line(aes(sample=-log10(ppat)),colour="cornflowerblue")+
-  theme_classic()
-
-#Model 2B upturned manhattan overview
-mt_m <- unstrat[unstrat$model=="model2b",c("outcome_type","person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_dose","exposure_type","outcome_class","outcome_subclass2","outcome_time","est","fdr","outcome_subclass1","p")]
-mt_m$exposure <- paste(mt_m$exposure_class,mt_m$exposure_subclass,mt_m$exposure_time,mt_m$exposure_dose,mt_m$exposure_type)
+# Strongest associations - Model 2B upturned manhattan overview
+mt_m <- unstrat[unstrat$model=="model2b",c("outcome_type","person_exposed","exposure_class2","exposure_subclass","exposure_time3","exposure_dose","exposure_type","outcome_class","outcome_subclass2","outcome_time","est","est_SDM","fdr","outcome_subclass1","p","hit_category")]
+mt_m$exposure <- paste(mt_m$exposure_class2,mt_m$exposure_subclass,mt_m$exposure_time3,mt_m$exposure_dose,mt_m$exposure_type)
 mt_m$outcome <- paste(mt_m$outcome_class,mt_m$outcome_subclass2,mt_m$outcome_time)
-mt_m$fdr_alpha <- 0.2
-mt_m$fdr_alpha[mt_m$fdr<0.05] <- 0.5
-mt_m$fdr_alpha[mt_m$fdr<0.005] <- 0.6
-mt_m$fdr_alpha[mt_m$fdr<0.0005] <- 0.7
-mt_m$fdr_alpha[mt_m$fdr<0.00005] <- 0.8
-mt_m$fdr_alpha[mt_m$fdr<0.000005] <- 0.9
-mt_m$fdr_alpha[mt_m$fdr<0.0000005] <- 1.0
-# to convert ln(OR) to cohen's d (SDM), multiply ln(OR) by sqrt(3)/pi (which is 0.5513)
-mt_m$est_SDM <- mt_m$est
-mt_m$est_SDM[mt_m$outcome_type=="binary"]<-mt_m$est[mt_m$outcome_type=="binary"]*0.5513
+mt_m$exposure_class <- factor(mt_m$exposure_class2, ordered=T, levels=c("Smoking","Alcohol consumption", "Caffeine consumption","Low SEP"))
 
-mt_m$exposure_class <- factor(mt_m$exposure_class, ordered=T, levels=c("smoking","alcohol consumption", "caffeine consumption","low socioeconomic position"))
-require(RColorBrewer)
-ggplot(mt_m,aes(y=outcome_subclass2,x=est_SDM,colour=exposure_class))+
-  geom_jitter(aes(alpha=fdr_alpha*0.7))+
+ggplot(mt_m,aes(y=outcome_subclass2,x=est_SDM,colour=hit_category))+
+  geom_jitter(aes(alpha=as.numeric(hit_category)*0.25))+
   geom_vline(xintercept=0)+
-  scale_colour_manual(values=brewer.pal(8, "Dark2")[2:8])+
-  facet_grid(outcome_class~person_exposed,space = "free_y",scales="free_y")+
-  theme_minimal()+xlab("Standardised effect estimate (Cohen's D)")+ylab("Child outcomes")+
-  theme(strip.text.y=element_blank())
-
-ggplot(mt_m,aes(y=outcome_subclass2,x=est_SDM,colour=fdr<0.05))+
-  geom_jitter(aes(alpha=fdr_alpha*0.7))+
-  geom_vline(xintercept=0)+
-  scale_colour_manual(values=brewer.pal(8, "Dark2")[c(8,4)])+
-  facet_grid(outcome_class~exposure_class+person_exposed,space = "free_y",scales="free_y")+
+ scale_colour_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(outcome_class~exposure_class+person_exposed,space = "free_y",scales="free_y")+
   theme_classic()+xlab("Standardised effect estimate (Cohen's D)")+ylab("Child outcomes")+
-  theme(strip.text.y=element_blank())
-
-# strongest associations
-hits_bin <- unstrat[unstrat$fdr<0.05&unstrat$cohorts_n>1&unstrat$outcome_type=="binary",]
-hits_cont <- unstrat[unstrat$fdr<0.05&unstrat$cohorts_n>1&unstrat$outcome_type=="continuous",]
-require(tidyverse)
-
-mean_estimates <- hits_bin %>%
-  group_by(paste(person_exposed,exposure_subclass,outcome_subclass2)) %>%
-  summarise_at(vars(est), list(mean_est = mean, max_est=max, min_est=min))
-mean_estimates[order(mean_estimates$mean_est),]->mean_estimates_bin
-mean_estimates_bin$mean_or <- exp(mean_estimates_bin$mean_est)
-mean_estimates_bin$min_or <- exp(mean_estimates_bin$min_est)
-mean_estimates_bin$max_or <- exp(mean_estimates_bin$max_est)
-
-mean_estimates <- hits_cont %>%
-  group_by(paste(person_exposed,exposure_subclass,outcome_subclass2)) %>%
-  summarise_at(vars(est), list(mean_est = mean, max_est=max, min_est=min))
-mean_estimates[order(mean_estimates$mean_est),]->mean_estimates_cont
+  guides(alpha = "none")+
+  theme(strip.text.y=element_blank(),strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
+        legend.position="bottom",legend.title=element_blank(),
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,-10,-10,-10))
 
 
-# triangulation with heatmap MOTHERS
+# triangulation with heatmap DURING PREGNANCY
 
-## MVR
-top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$fdr<0.05&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n")] #model 2a for MVR,obs unstrata only
-top_hits_2a$combination <- apply(top_hits_2a[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
-                                 1,paste,collapse="_")
-top_hits_2a_m <- top_hits_2a[top_hits_2a$person_exposed=="mother"&top_hits_2a$exposure_time=="ever in pregnancy",]
-tdat_s <- data.frame(outcome = top_hits_2a_m$combination[top_hits_2a_m$exposure_class=="smoking"],
-                   sign=sign(top_hits_2a_m$est[top_hits_2a_m$exposure_class=="smoking"]))
-tdat_a <- data.frame(outcome = top_hits_2a_m$combination[top_hits_2a_m$exposure_class=="alcohol consumption"],
-                     sign=sign(top_hits_2a_m$est[top_hits_2a_m$exposure_class=="alcohol consumption"]))
-tdat_c <- data.frame(outcome = top_hits_2a_m$combination[top_hits_2a_m$exposure_class=="caffeine consumption"],
-                     sign=sign(top_hits_2a_m$est[top_hits_2a_m$exposure_class=="caffeine consumption"]))
+DIM <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$exposure_time%in%c("ever in pregnancy","first trimester","second trimester","third trimester")&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
+dim(DIM[DIM$person_exposed=="mother",])
+dim(DIM[DIM$person_exposed=="partner",])
+dim(DIM[DIM$person_exposed=="mother"&DIM$fdr<0.05,])
+dim(DIM[DIM$person_exposed=="partner"&DIM$fdr<0.05,])
 
-## GRS
-top_hits_grs <- unstrat[unstrat$exposure_subclass=="genetic risk score"&unstrat$p<0.05&unstrat$model=="model2a",] #model 2a for grs
-top_hits_grs$combination <- apply(top_hits_grs[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
-                                  1,paste,collapse="_")
-top_hits_grs_m <- top_hits_grs[top_hits_grs$person_exposed=="mother",]
-tdat_s_grs <- data.frame(outcome = top_hits_grs_m$combination[top_hits_grs_m$exposure_class=="smoking"&top_hits_grs_m$exposure_time=="initiation"],
-                     sign=sign(top_hits_grs_m$est[top_hits_grs_m$exposure_class=="smoking"&top_hits_grs_m$exposure_time=="initiation"]))
-tdat_a_grs <- data.frame(outcome = top_hits_grs_m$combination[top_hits_grs_m$exposure_class=="alcohol consumption"],
-                     sign=sign(top_hits_grs_m$est[top_hits_grs_m$exposure_class=="alcohol consumption"]))
-tdat_c_grs <- data.frame(outcome = top_hits_grs_m$combination[top_hits_grs_m$exposure_class=="caffeine consumption"],
-                     sign=sign(top_hits_grs_m$est[top_hits_grs_m$exposure_class=="caffeine consumption"]))
+source("OneDrive - University of Exeter/Projects/EPoCH/triangulation.R")
 
-tdat_s <- merge(tdat_s,tdat_s_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_s <-tdat_s[duplicated(tdat_s$outcome)==F,]
-tdat_a <- merge(tdat_a,tdat_a_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_a <-tdat_a[duplicated(tdat_a$outcome)==F,]
-tdat_c <- merge(tdat_c,tdat_c_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_c <-tdat_c[duplicated(tdat_c$outcome)==F,]
+T_mothers_preg <-triangulate_results(unstrat,"mother",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
+T_partners_preg <-triangulate_results(unstrat,"partner",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
+T_both_preg<-combine_triang_results(T_mothers_preg,T_partners_preg)
 
-# Neg Con
-top_hits_negcon_m <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$pmat<0.05 & matpat$samedir==T & matpat$samedir_diff>0& matpat$model=="model2b",] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05
-top_hits_negcon_m$combination <- apply(top_hits_negcon_m[,c("outcome_classmat","outcome_subclass1mat","outcome_subclass2mat","outcome_timemat","outcome_typemat")],
-                                  1,paste,collapse="_")
-top_hits_negcon_m <- top_hits_negcon_m[top_hits_negcon_m$exposure_time=="ever in pregnancy",]
+T_mothers_precon_post <-triangulate_results(unstrat,"mother","preconception","postnatal")
+T_partners_precon_post <-triangulate_results(unstrat,"partner","preconception","postnatal")
+T_both_precon_post<-combine_triang_results(T_mothers_precon_post,T_partners_precon_post)
 
-tdat_s_negcon <- data.frame(outcome = top_hits_negcon_m$combination[top_hits_negcon_m$exposure_class=="smoking"],
-                         signnegcon=sign(top_hits_negcon_m$estmat[top_hits_negcon_m$exposure_class=="smoking"]))
-tdat_a_negcon <- data.frame(outcome = top_hits_negcon_m$combination[top_hits_negcon_m$exposure_class=="alcohol consumption"],
-                            signnegcon=sign(top_hits_negcon_m$estmat[top_hits_negcon_m$exposure_class=="alcohol consumption"]))
-tdat_c_negcon <- data.frame(outcome = top_hits_negcon_m$combination[top_hits_negcon_m$exposure_class=="caffeine consumption"],
-                            signnegcon=sign(top_hits_negcon_m$estmat[top_hits_negcon_m$exposure_class=="caffeine consumption"]))
+T_mothers_precon_preg <-triangulate_results(unstrat,"mother","preconception","during pregnancy")
+T_partners_precon_preg <-triangulate_results(unstrat,"partner","preconception","during pregnancy")
+T_both_precon_preg<-combine_triang_results(T_mothers_precon_preg,T_partners_precon_preg)
 
-tdat_s <- merge(tdat_s,tdat_s_negcon,by="outcome",all=T)
-tdat_s <-tdat_s[duplicated(tdat_s$outcome)==F,]
-tdat_a <- merge(tdat_a,tdat_a_negcon,by="outcome",all=T)
-tdat_a <-tdat_a[duplicated(tdat_a$outcome)==F,]
-tdat_c <- merge(tdat_c,tdat_c_negcon,by="outcome",all=T)
-tdat_c <-tdat_c[duplicated(tdat_c$outcome)==F,]
-
-tdat_s[tdat_s==(-1)]<-"negative\nassociation"
-tdat_s[tdat_s==(1)]<-"positive\nassociation"
-tdat_c[tdat_c==(-1)]<-"negative\nassociation"
-tdat_c[tdat_c==(1)]<-"positive\nassociation"
-tdat_a[tdat_a==(-1)]<-"negative\nassociation"
-tdat_a[tdat_a==(1)]<-"positive\nassociation"
-
-## plot
-
-## heatmap
-
-tdat_s$total <- "1 line\nof evidence"
-tdat_s$total[tdat_s$signmvr==tdat_s$signgrs]<-"2 lines\nof evidence"
-tdat_s$total[tdat_s$signmvr==tdat_s$signnegcon]<-"2 lines\nof evidence"
-tdat_s$total[tdat_s$signgrs==tdat_s$signnegcon]<-"2 lines\nof evidence"
-tdat_s$total[(tdat_s$signgrs==tdat_s$signnegcon)&(tdat_s$signmvr==tdat_s$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_a$total <- "1 line\nof evidence"
-tdat_a$total[tdat_a$signmvr==tdat_a$signgrs]<-"2 lines\nof evidence"
-tdat_a$total[tdat_a$signmvr==tdat_a$signnegcon]<-"2 lines\nof evidence"
-tdat_a$total[tdat_a$signgrs==tdat_a$signnegcon]<-"2 lines\nof evidence"
-tdat_a$total[(tdat_a$signgrs==tdat_a$signnegcon)&(tdat_a$signmvr==tdat_a$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_c$total <- "1 line\nof evidence"
-tdat_c$total[tdat_c$signmvr==tdat_c$signgrs]<-"2 lines\nof evidence"
-tdat_c$total[tdat_c$signmvr==tdat_c$signnegcon]<-"2 lines\nof evidence"
-tdat_c$total[tdat_c$signgrs==tdat_c$signnegcon]<-"2 lines\nof evidence"
-tdat_c$total[(tdat_c$signgrs==tdat_c$signnegcon)&(tdat_c$signmvr==tdat_c$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_s_melt <- reshape2::melt(tdat_s,na.rm = F,id.vars="outcome")
-tdat_s_melt$exposure<-"smoking"
-tdat_s_melt$parent<-"mother"
-tdat_c_melt <- reshape2::melt(tdat_c,na.rm = F,id.vars="outcome")
-tdat_c_melt$exposure<-"caffeine consumption"
-tdat_c_melt$parent<-"mother"
-tdat_a_melt <- reshape2::melt(tdat_a,na.rm = F,id.vars="outcome")
-tdat_a_melt$exposure<-"alcohol consumption"
-tdat_a_melt$parent<-"mother"
-tdat_mothers <- rbind(tdat_s_melt,tdat_c_melt,tdat_a_melt)
-tdat_mothers <- tdat_mothers[is.na(tdat_mothers$outcome)==F,]
-
-tdat_mothers$outcome_class <- unlist(lapply(lapply(lapply(tdat_mothers$outcome,stringr::str_split,pattern = "_"),unlist),"[",1))
-tdat_mothers$outcome_subclass <- paste(unlist(lapply(lapply(lapply(tdat_mothers$outcome,stringr::str_split,pattern = "_"),unlist),"[",3)),
-                                        unlist(lapply(lapply(lapply(tdat_mothers$outcome,stringr::str_split,pattern = "_"),unlist),"[",4)),
-                                       sep=" at ") 
-
-tdat_mothers$value <- factor(tdat_mothers$value,ordered=T,levels=c("3 lines\nof evidence","2 lines\nof evidence","1 line\nof evidence","negative\nassociation","positive\nassociation"))
-tdat_mothers$exposure <- factor(tdat_mothers$exposure,ordered=T,levels=c("smoking","alcohol consumption","caffeine consumption"))
-tdat_mothers<-tdat_mothers[order(tdat_mothers$outcome_class,tdat_mothers$outcome_subclass),]
-tdat_mothers$outcome_subclass <- factor(tdat_mothers$outcome_subclass,ordered=T,levels=unique(tdat_mothers$outcome_subclass))
-
-tdat_mothers$variable2<-NA
-tdat_mothers$variable2[tdat_mothers$variable=="signmvr"]<-"MVR"
-tdat_mothers$variable2[tdat_mothers$variable=="signgrs"]<-"GRS"
-tdat_mothers$variable2[tdat_mothers$variable=="signnegcon"]<-"NC"
-tdat_mothers$variable2[tdat_mothers$variable=="total"]<-"T"
+saveRDS(T_both_preg,"OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/triangulation/triangulation_pregnancy.rds")
 
 
-cols <- c("negative\nassociation" = "#fc8d59", "positive\nassociation" = "#91bfdb", "1 line\nof evidence" = "#e5f5e0", "2 lines\nof evidence" = "#a1d99b", "3 lines\nof evidence"="#31a354")
-
-library(ggplot2)
-ggplot(tdat_mothers,aes(x=variable2,y=outcome_subclass))+
-  geom_tile(aes(fill=factor(value)))+
-  scale_fill_manual(values = cols,na.translate=F)+
-  facet_grid(.~exposure,scales = "free")+
-  theme_classic()+
-  theme(axis.text.y=element_text(size=6))
-
-
-
-
-
-
-
-
-# triangulation with heatmap PARTNERS
-
-## MVR
-top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$fdr<0.05&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n")] #model 2a for MVR,obs unstrata only
-top_hits_2a$combination <- apply(top_hits_2a[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
-                                 1,paste,collapse="_")
-top_hits_2a_p <- top_hits_2a[top_hits_2a$person_exposed=="partner"&top_hits_2a$exposure_time=="ever in pregnancy",]
-tdat_s <- data.frame(outcome = top_hits_2a_p$combination[top_hits_2a_p$exposure_class=="smoking"],
-                     sign=sign(top_hits_2a_p$est[top_hits_2a_p$exposure_class=="smoking"]))
-tdat_a <- data.frame(outcome = top_hits_2a_p$combination[top_hits_2a_p$exposure_class=="alcohol consumption"],
-                     sign=sign(top_hits_2a_p$est[top_hits_2a_p$exposure_class=="alcohol consumption"]))
-tdat_c <- data.frame(outcome = top_hits_2a_p$combination[top_hits_2a_p$exposure_class=="caffeine consumption"],
-                     sign=sign(top_hits_2a_p$est[top_hits_2a_p$exposure_class=="caffeine consumption"]))
-
-## GRS
-top_hits_grs <- unstrat[unstrat$exposure_subclass=="genetic risk score"&unstrat$p<0.05&unstrat$model=="model2a",] #model 2a for grs
-top_hits_grs$combination <- apply(top_hits_grs[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
-                                  1,paste,collapse="_")
-top_hits_grs_p <- top_hits_grs[top_hits_grs$person_exposed=="partner",]
-tdat_s_grs <- data.frame(outcome = top_hits_grs_p$combination[top_hits_grs_p$exposure_class=="smoking"&top_hits_grs_p$exposure_time=="initiation"],
-                         sign=sign(top_hits_grs_p$est[top_hits_grs_p$exposure_class=="smoking"&top_hits_grs_p$exposure_time=="initiation"]))
-tdat_a_grs <- data.frame(outcome = top_hits_grs_p$combination[top_hits_grs_p$exposure_class=="alcohol consumption"],
-                         sign=sign(top_hits_grs_p$est[top_hits_grs_p$exposure_class=="alcohol consumption"]))
-tdat_c_grs <- data.frame(outcome = top_hits_grs_p$combination[top_hits_grs_p$exposure_class=="caffeine consumption"],
-                         sign=sign(top_hits_grs_p$est[top_hits_grs_p$exposure_class=="caffeine consumption"]))
-
-tdat_s <- merge(tdat_s,tdat_s_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_s <-tdat_s[duplicated(tdat_s$outcome)==F,]
-tdat_a <- merge(tdat_a,tdat_a_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_a <-tdat_a[duplicated(tdat_a$outcome)==F,]
-tdat_c <- merge(tdat_c,tdat_c_grs,by="outcome",all.x=T,all.y=F,suffixes=c("mvr","grs"))
-tdat_c <-tdat_c[duplicated(tdat_c$outcome)==F,]
-
-# Neg Con
-top_hits_negcon_p <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$ppat<0.05 & matpat$samedir==T & matpat$samedir_diff>0& matpat$model=="model2b",] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05
-top_hits_negcon_p$combination <- apply(top_hits_negcon_p[,c("outcome_classmat","outcome_subclass1mat","outcome_subclass2mat","outcome_timemat","outcome_typemat")],
-                                       1,paste,collapse="_")
-top_hits_negcon_p <- top_hits_negcon_p[top_hits_negcon_p$exposure_time=="ever in pregnancy",]
-
-tdat_s_negcon <- data.frame(outcome = top_hits_negcon_p$combination[top_hits_negcon_p$exposure_class=="smoking"],
-                            signnegcon=sign(top_hits_negcon_p$estmat[top_hits_negcon_p$exposure_class=="smoking"]))
-tdat_a_negcon <- data.frame(outcome = top_hits_negcon_p$combination[top_hits_negcon_p$exposure_class=="alcohol consumption"],
-                            signnegcon=sign(top_hits_negcon_p$estmat[top_hits_negcon_p$exposure_class=="alcohol consumption"]))
-tdat_c_negcon <- data.frame(outcome = top_hits_negcon_p$combination[top_hits_negcon_p$exposure_class=="caffeine consumption"],
-                            signnegcon=sign(top_hits_negcon_p$estmat[top_hits_negcon_p$exposure_class=="caffeine consumption"]))
-
-tdat_s <- merge(tdat_s,tdat_s_negcon,by="outcome",all=T)
-tdat_s <-tdat_s[duplicated(tdat_s$outcome)==F,]
-tdat_a <- merge(tdat_a,tdat_a_negcon,by="outcome",all=T)
-tdat_a <-tdat_a[duplicated(tdat_a$outcome)==F,]
-tdat_c <- merge(tdat_c,tdat_c_negcon,by="outcome",all=T)
-tdat_c <-tdat_c[duplicated(tdat_c$outcome)==F,]
-
-tdat_s[tdat_s==(-1)]<-"negative\nassociation"
-tdat_s[tdat_s==(1)]<-"positive\nassociation"
-tdat_c[tdat_c==(-1)]<-"negative\nassociation"
-tdat_c[tdat_c==(1)]<-"positive\nassociation"
-tdat_a[tdat_a==(-1)]<-"negative\nassociation"
-tdat_a[tdat_a==(1)]<-"positive\nassociation"
-
-## plot
-
-## heatmap
-
-tdat_s$total <- "1 line\nof evidence"
-tdat_s$total[tdat_s$signmvr==tdat_s$signgrs]<-"2 lines\nof evidence"
-tdat_s$total[tdat_s$signmvr==tdat_s$signnegcon]<-"2 lines\nof evidence"
-tdat_s$total[tdat_s$signgrs==tdat_s$signnegcon]<-"2 lines\nof evidence"
-tdat_s$total[(tdat_s$signgrs==tdat_s$signnegcon)&(tdat_s$signmvr==tdat_s$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_a$total <- "1 line\nof evidence"
-tdat_a$total[tdat_a$signmvr==tdat_a$signgrs]<-"2 lines\nof evidence"
-tdat_a$total[tdat_a$signmvr==tdat_a$signnegcon]<-"2 lines\nof evidence"
-tdat_a$total[tdat_a$signgrs==tdat_a$signnegcon]<-"2 lines\nof evidence"
-tdat_a$total[(tdat_a$signgrs==tdat_a$signnegcon)&(tdat_a$signmvr==tdat_a$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_c$total <- "1 line\nof evidence"
-tdat_c$total[tdat_c$signmvr==tdat_c$signgrs]<-"2 lines\nof evidence"
-tdat_c$total[tdat_c$signmvr==tdat_c$signnegcon]<-"2 lines\nof evidence"
-tdat_c$total[tdat_c$signgrs==tdat_c$signnegcon]<-"2 lines\nof evidence"
-tdat_c$total[(tdat_c$signgrs==tdat_c$signnegcon)&(tdat_c$signmvr==tdat_c$signnegcon)]<-"3 lines\nof evidence"
-
-tdat_s_melt <- reshape2::melt(tdat_s,na.rm = F,id.vars="outcome")
-tdat_s_melt$exposure<-"smoking"
-tdat_s_melt$parent<-"partner"
-tdat_c_melt <- reshape2::melt(tdat_c,na.rm = F,id.vars="outcome")
-tdat_c_melt$exposure<-"caffeine consumption"
-tdat_c_melt$parent<-"partner"
-tdat_a_melt <- reshape2::melt(tdat_a,na.rm = F,id.vars="outcome")
-tdat_a_melt$exposure<-"alcohol consumption"
-tdat_a_melt$parent<-"partner"
-tdat_partners <- rbind(tdat_s_melt,tdat_c_melt,tdat_a_melt)
-tdat_partners <- tdat_partners[is.na(tdat_partners$outcome)==F,]
-
-tdat_partners$outcome_class <- unlist(lapply(lapply(lapply(tdat_partners$outcome,stringr::str_split,pattern = "_"),unlist),"[",1))
-tdat_partners$outcome_subclass <- paste(unlist(lapply(lapply(lapply(tdat_partners$outcome,stringr::str_split,pattern = "_"),unlist),"[",3)),
-                                       unlist(lapply(lapply(lapply(tdat_partners$outcome,stringr::str_split,pattern = "_"),unlist),"[",4)),
-                                       sep=" at ") 
-
-tdat_partners$value <- factor(tdat_partners$value,ordered=T,levels=c("3 lines\nof evidence","2 lines\nof evidence","1 line\nof evidence","negative\nassociation","positive\nassociation"))
-tdat_partners$exposure <- factor(tdat_partners$exposure,ordered=T,levels=c("smoking","alcohol consumption","caffeine consumption"))
-tdat_partners<-tdat_partners[order(tdat_partners$outcome_class,tdat_partners$outcome_subclass),]
-tdat_partners$outcome_subclass <- factor(tdat_partners$outcome_subclass,ordered=T,levels=unique(tdat_partners$outcome_subclass))
-
-tdat_partners$variable2<-NA
-tdat_partners$variable2[tdat_partners$variable=="signmvr"]<-"MVR"
-tdat_partners$variable2[tdat_partners$variable=="signgrs"]<-"GRS"
-tdat_partners$variable2[tdat_partners$variable=="signnegcon"]<-"NC"
-tdat_partners$variable2[tdat_partners$variable=="total"]<-"T"
-
-
-cols <- c("negative\nassociation" = "#fc8d59", "positive\nassociation" = "#91bfdb", "1 line\nof evidence" = "#e5f5e0", "2 lines\nof evidence" = "#a1d99b", "3 lines\nof evidence"="#31a354")
-
-library(ggplot2)
-ggplot(tdat_partners,aes(x=variable2,y=outcome_subclass))+
-  geom_tile(aes(fill=factor(value)))+
-  scale_fill_manual(values = cols,na.translate=F)+
-  facet_grid(.~exposure,scales = "free")+
-  theme_classic()+
-  theme(axis.text.y=element_text(size=6))
-
-
-
-require(ggh4x)
-require(ggnewscale)
-both <- rbind(tdat_mothers,tdat_partners)
-
-both$variable2 <- factor(both$variable2,ordered=T,levels=c("MVR","NC","GRS","T"))
-both$T <- "No"
-both$T[both$variable2=="T"]<-"Yes"
+# plot
 
 my_strips <- strip_nested(
   # Horizontal strips
@@ -660,7 +478,18 @@ my_strips <- strip_nested(
   by_layer_x = TRUE
 )
 
-ggplot(both,aes(x=variable2,y=outcome_subclass))+
+cols <- c("negative\nassociation" = "#fc8d59", "positive\nassociation" = "#91bfdb","0 lines\nof evidence" = "grey90", "1 line\nof evidence" = "#edf8e9", "2 lines\nof evidence" = "#bae4b3", "3 lines\nof evidence"="#74c476", "4 lines\nof evidence"="#31a354", "5 lines\nof evidence"="#006d2c")
+
+# removing outcomes from plot if no MVR association has FDR<0.05
+FDR_insig <- T_both_preg[is.na(T_both_preg$value) & T_both_preg$variable=="signmvr2",]
+FDR_insig_t <-data.frame(table(FDR_insig$outcome,paste(FDR_insig$exposure,FDR_insig$parent)))
+FDR_insig_w <- dcast(FDR_insig_t, Var1~Var2,value.var = 'Freq')
+FDR_insig_w$all_insig <- rowSums(FDR_insig_w[,-1])==6
+FDR_insig <- as.character(FDR_insig_w$Var1[FDR_insig_w$all_insig])
+
+data_to_plot <- droplevels(T_both_preg[(T_both_preg$outcome %in% FDR_insig)==F,])
+
+ggplot(data_to_plot,aes(x=variable2,y=outcome_subclass))+
   geom_tile(aes(fill=factor(value)))+
   scale_fill_manual(values = cols,na.translate=F)+
   facet_nested(outcome_class~exposure+parent+T,scales = "free",space="free",strip = my_strips)+
@@ -679,5 +508,11 @@ ggplot(both,aes(x=variable2,y=outcome_subclass))+
         legend.box.spacing = unit(0, "pt"))
 
 
+T_both_preg[which(T_both_preg$value=="5 lines\nof evidence"),]->Pregnancy_outcomes
+T_both_precon_preg[which(T_both_precon_preg$value=="5 lines\nof evidence"),]->Precon_Preg_outcomes
+T_both_precon_post[which(T_both_precon_post$value=="5 lines\nof evidence"),]->Precon_Preg_outcomes
 
+# now compare these with effect of SEP to contextualise evidence
+
+apply(Pregnancy_outcomes,1,paste,collapse="_")[apply(Pregnancy_outcomes,1,function(x){paste(x,collapse="_") %in% apply(Prenatal_outcomes,1,paste,collapse="_")})]
 
