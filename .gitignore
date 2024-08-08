@@ -1,0 +1,30 @@
+
+*.rds
+.DS_Store
+*.xlsx
+*.history
+data_prep/cohorts/alspac/.Rhistory
+*.txt
+*.in
+*.profile
+*.dta
+*.raw
+*.pdf
+*.tbi
+*.log
+*.error
+*.out
+*.bed
+*.bim
+*.fam
+*.map
+*.ped
+*.e9359024
+*.html
+/data_prep/cohorts/alspac/Genetic scores
+/data_prep/cohorts/bib/pca_prep
+/data_prep/cohorts/alspac/Principal_components
+/data_prep/cohorts/bib/genetic scores
+/data_prep/cohorts/bib/documentation
+/data_prep/cohorts/alspac/documentation
+/data_prep/cohorts/mcs/documentation
