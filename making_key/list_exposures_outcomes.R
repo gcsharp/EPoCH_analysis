@@ -1,0 +1,112 @@
+# Remove prs sensitivity analysis names if necessary
+if(cohort=="ALSPAC"){
+dat <- dat[,-grep("sens_exc",colnames(dat))]
+}
+
+# Create list of exposures and outcomes
+
+sep_exposures <- names(dat)[grep(names(dat),pattern="highestlowest")]
+smoking_exposures <- names(dat)[grep(names(dat),pattern="smoking_m|smoking_f|mother_smoking|father_smoking")]
+prs_smoking_exposures <- names(dat)[grep(names(dat),pattern="mother_smoking|father_smoking")]
+alcohol_exposures <- names(dat)[grep(names(dat),pattern="alcohol_m|alcohol_f|score_father_alcohol|score_mother_alcohol")]
+prs_alcohol_exposures <- names(dat)[grep(names(dat),pattern="score_mother_alcohol|score_father_alcohol")]
+binge_alcohol_exposures <-alcohol_exposures[grep(alcohol_exposures,pattern="binge")]
+passive_smoking_exposures <- smoking_exposures[grep(smoking_exposures,pattern="passive")]
+caffeine_exposures <- names(dat)[grep(names(dat),pattern="caffeine_m|caffeine_f|score_mother_caffeine|score_father_caffeine")]
+prs_caffeine_exposures <- names(dat)[grep(names(dat),pattern="mother_caffeine|father_caffeine")]
+coffee_exposures <- caffeine_exposures[grep(caffeine_exposures,pattern="coffee")]
+tea_exposures <- caffeine_exposures[grep(caffeine_exposures,pattern="tea")]
+cola_exposures <- caffeine_exposures[grep(caffeine_exposures,pattern="cola")]
+physact_exposures <- names(dat)[grep(names(dat),pattern="physact_m|physact_f|score_mother_pa|score_father_pa")]
+prs_physact_exposures <- names(dat)[grep(names(dat),pattern="_pa_")]
+prs_exposures <- names(dat)[grep(names(dat),pattern="prs_score_m|prs_score_f")]
+diet_exposures <- names(dat)[grep(names(dat),pattern="_rmed_|_rmed2_")]
+meddiet_rmed <- names(dat)[grep(names(dat),pattern="_rmed_")]
+meddiet_rmed2 <- names(dat)[grep(names(dat),pattern="_rmed2_")]
+all_exposures <- na.omit(c(diet_exposures,sep_exposures,smoking_exposures,alcohol_exposures,caffeine_exposures,physact_exposures))
+all_exposures <- all_exposures[grepl(all_exposures,pattern="zscore|binary|ordinal|cont|sds")]
+
+peri_outcomes <- names(dat)[grep(names(dat),pattern="peri_")]
+anthro_outcomes <- names(dat)[grep(names(dat),pattern="anthro_")]
+neuro_outcomes <- names(dat)[grep(names(dat),pattern="neuro_")]
+immuno_outcomes <- names(dat)[grep(names(dat),pattern="immuno_")]
+negcon_outcomes <- names(dat)[grep(names(dat),pattern="negcon_")]
+cardio_outcomes <- names(dat)[grep(names(dat),pattern="cardio_")]
+
+asthma_outcomes <-names(dat)[grep(names(dat),pattern="immuno_asthma")]
+wheeze_outcomes <-names(dat)[grep(names(dat),pattern="immuno_wheeze")]
+eczema_outcomes <-names(dat)[grep(names(dat),pattern="immuno_eczema")]
+allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy")]
+pet_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_pet")]
+dog_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_dog")]
+cat_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_cat")]
+food_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_food")]
+dust_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_dust")]
+insect_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_insect")]
+pollen_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_pollen|allergy_hay")]
+any_allergy_outcomes <-names(dat)[grep(names(dat),pattern="immuno_allergy_any")]
+
+bmi_outcomes <-names(dat)[grep(names(dat),pattern="anthro_bmi")]
+overweight_outcomes <-names(dat)[grep(names(dat),pattern="overweightobese")]
+obese_outcomes <-names(dat)[grep(names(dat),pattern="_obese")]
+birthweight_outcomes <-names(dat)[grep(names(dat),pattern="anthro_birthweight")]
+height_outcomes <-names(dat)[grep(names(dat),pattern="anthro_height")]
+weight_outcomes <-names(dat)[grep(names(dat),pattern="anthro_weight")]
+waist_outcomes <-names(dat)[grep(names(dat),pattern="anthro_waist")]
+birthlength_outcomes <-names(dat)[grep(names(dat),pattern="anthro_crown_heel")]
+headcirc_outcomes <-names(dat)[grep(names(dat),pattern="anthro_head_circ")]
+fatmass_outcomes <-names(dat)[grep(names(dat),pattern="anthro_fmi|anthro_fatpc")]
+
+depression_outcomes <-names(dat)[grep(names(dat),pattern="neuro_depression")]
+hyperactivity_outcomes <-names(dat)[grep(names(dat),pattern="neuro_hyperactivity|hyperactiv")]
+emotional_outcomes <-names(dat)[grep(names(dat),pattern="neuro_emotional")]
+conduct_outcomes <-names(dat)[grep(names(dat),pattern="neuro_conduct")]
+peer_outcomes <-names(dat)[grep(names(dat),pattern="neuro_peer")]
+prosocial_outcomes <-names(dat)[grep(names(dat),pattern="neuro_prosocial")]
+totalsdq_outcomes <-names(dat)[grep(names(dat),pattern="neuro_totalsdq")]
+cbcl_outcomes <-names(dat)[grep(names(dat),pattern="neuro_totalcbcl")]
+csbq_outcomes <-names(dat)[grep(names(dat),pattern="csbq")]
+internalising_outcomes <-names(dat)[grep(names(dat),pattern="neuro_internalising")]
+externalising_outcomes <-names(dat)[grep(names(dat),pattern="neuro_externalising")]
+sdq_outcomes <- c(hyperactivity_outcomes,emotional_outcomes,conduct_outcomes,peer_outcomes,prosocial_outcomes,totalsdq_outcomes,internalising_outcomes,externalising_outcomes)
+autistic_trait_outcomes <-names(dat)[grep(names(dat),pattern="neuro_scdc|autism|development")]
+autism_outcomes <-names(dat)[grep(names(dat),pattern="autism")]
+scdc_outcomes <-names(dat)[grep(names(dat),pattern="neuro_scdc")] 
+csbqindependence_outcomes <-names(dat)[grep(names(dat),pattern="csbqindep")] 
+csbqemotional_outcomes <-names(dat)[grep(names(dat),pattern="csbqemo")] 
+aggression_outcomes <-names(dat)[grep(names(dat),pattern="aggression")]
+asq_socialcomm_outcomes <-names(dat)[grep(names(dat),pattern="development")]
+
+cognitive_outcomes <-names(dat)[grep(names(dat),pattern="neuro_cognition")]
+cognitive_performance_outcomes <-names(dat)[grep(names(dat),pattern="neuro_cognition_performance|spatialawareness|problemsolving")]
+cognitive_verbal_outcomes <-names(dat)[grep(names(dat),pattern="neuro_cognition_verbal|reading|namingvocab")]
+cognitive_total_outcomes <-names(dat)[grep(names(dat),pattern="neuro_cognition_total")]
+cognitive_reading_outcomes <-names(dat)[grep(names(dat),pattern="reading")]
+cognitive_numberskills_outcomes <-names(dat)[grep(names(dat),pattern="numberskills")]
+cognitive_schoolreadiness_outcomes <-names(dat)[grep(names(dat),pattern="schoolreadiness")]
+cognitive_namingvocab_outcomes <-names(dat)[grep(names(dat),pattern="namingvocab")]
+cognitive_problemsolving_outcomes <-names(dat)[grep(names(dat),pattern="problemsolving")]
+cognitive_spatialawareness_outcomes <-names(dat)[grep(names(dat),pattern="spatialawareness")]
+
+sbp_outcomes <-names(dat)[grep(names(dat),pattern="cardio_sbp")]
+dbp_outcomes <-names(dat)[grep(names(dat),pattern="cardio_dbp")]
+hdl_outcomes <-names(dat)[grep(names(dat),pattern="cardio_HDL")]
+ldl_outcomes <-names(dat)[grep(names(dat),pattern="cardio_LDL")]
+chol_outcomes <-names(dat)[grep(names(dat),pattern="cardio_chol")]
+glucose_outcomes <-names(dat)[grep(names(dat),pattern="cardio_glucose")]
+insulin_outcomes <-names(dat)[grep(names(dat),pattern="cardio_insulin")]
+apoa_outcomes <-names(dat)[grep(names(dat),pattern="cardio_apoA")]
+apob_outcomes <-names(dat)[grep(names(dat),pattern="cardio_apoB")]
+crp_outcomes <-names(dat)[grep(names(dat),pattern="cardio_CRP")]
+il6_outcomes <-names(dat)[grep(names(dat),pattern="cardio_il6")]
+trig_outcomes <-names(dat)[grep(names(dat),pattern="cardio_trig")]
+
+bp_outcomes <- c(sbp_outcomes,dbp_outcomes)
+biomarker_outcomes <-c(trig_outcomes,il6_outcomes,crp_outcomes,apoa_outcomes,apob_outcomes,insulin_outcomes,glucose_outcomes,chol_outcomes,ldl_outcomes,hdl_outcomes)
+cholesterol_outcomes <- c(hdl_outcomes,ldl_outcomes,chol_outcomes)
+  
+mice_outcomes<-names(dat)[grep(names(dat),pattern="negcon_mice")]
+pigeon_outcomes<-names(dat)[grep(names(dat),pattern="negcon_pigeon")]
+lefthand_outcomes<-names(dat)[grep(names(dat),pattern="negcon_lefthand")]
+
+all_outcomes <- c(anthro_outcomes,neuro_outcomes,immuno_outcomes,negcon_outcomes,cardio_outcomes,peri_outcomes)
