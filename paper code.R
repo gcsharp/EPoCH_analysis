@@ -4,11 +4,40 @@ dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results a
 
 # Summarising sample sizes
 unstrat <-dat[-grep(dat$model_new_name,pattern="stratified"),]
-aggregate(unstrat$total_n, list(unstrat$cohorts_n), FUN=summary)
-aggregate(unstrat$total_n, list(unstrat$cohorts_n), FUN=length)
-summary(unstrat$total_n)
+S4TS1 <- unstrat %>% group_by(model_new_name,person_exposed) %>% summarise(n_analyses=length(total_n),n_cohorts_more_1 =sum(cohorts_n>1), pc_cohorts_more_1 =100*(sum(cohorts_n>1)/length(cohorts_n)),mean_n=mean(total_n),min_n=min(total_n),max_n=max(total_n))
+unstrat[unstrat$model=="model2a",] %>% group_by(cohorts_n>1) %>% summarise(n_analyses=length(total_n), mean=mean(total_n),min=min(total_n),max=max(total_n))
+unstrat[unstrat$model=="model2b",] %>% group_by(cohorts_n>1) %>% summarise(n_analyses=length(total_n), mean=mean(total_n),min=min(total_n),max=max(total_n))
+
+write.csv(S4TS1,"~/OneDrive - University of Exeter/Projects/EPoCH/S4TS1.csv")
 
 # Summarising sample characteristics 
+
+table1_alspac <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/alspac.csv")
+table1_mcs <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/mcs.csv")
+table1_bib <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/bib.csv")
+cohorts <- list(table1_alspac,table1_bib,table1_mcs)
+names(cohorts)<-c("alspac","bib","mcs")
+S4TS2 <- bind_rows(cohorts,.id="cohort")
+S4TS2 <- S4TS2[grepl("mother|partner",S4TS2$variable)&grepl("binary",S4TS2$variable)&grepl("alcohol|caffeine|smoking|low sep",S4TS2$variable),] %>% group_by(paste(variable, level)) %>% summarise(ncohorts=length(total.n),n=sum(total.n)-sum(n.missing),nlevel=sum(n.in.level))
+S4TS2$pclevel <-100*(S4TS2$nlevel/S4TS2$n)
+S4TS2 <- S4TS2[grepl("binary 0|binge",S4TS2$`paste(variable, level)`)==F,]
+names(S4TS2)<-c("variable","ncohorts","n","nlevel","pclevel")
+S4TS2$exposure_class <- unlist(lapply(str_split(S4TS2$variable,pattern = " - "),"[",1))
+S4TS2$exposure_time <- unlist(lapply(str_split(S4TS2$variable,pattern = " - "),"[",2))
+S4TS2$parent <- unlist(lapply(str_split(S4TS2$variable,pattern = " - "),"[",3))
+S4TS2$exposure_class[S4TS2$exposure_class=="any caffeine"]<-"caffeine"
+S4TS2$exposure_time[S4TS2$exposure_class=="low sep based on education"]<-"education"
+S4TS2$exposure_time[S4TS2$exposure_class=="low sep based on occupation"]<-"occupation"
+S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on education"]<-"low SEP"
+S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on occupation"]<-"low SEP"
+S4TS2$exposure_time<-factor(S4TS2$exposure_time,ordered=T,levels=c("education","occupation","ever in life","early onset (before age 12)","preconception","first trimester","second trimester","third trimester","ever in pregnancy","first two postnatal years"))
+ggplot(S4TS2,aes(x=exposure_time,y=pclevel))+
+  geom_col(fill="aquamarine4")+
+  geom_text(size=3,aes(y=pclevel+6,label=paste0(round(pclevel),"%")))+
+  coord_flip()+
+  facet_grid(exposure_class~parent,space = "free",scales="free")+
+  xlab("")+ylab("Percentage in exposed group")+
+  theme_grey()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank() )
 
 ## Function to make cohort summaries
 make_cohort_summary <- function(VAR_b_s,VAR_o_s,VAR_o_a,VAR_b_a,VAR_o_c,VAR_b_c,VAR_to_s,VAR_to_a,VAR_to_c,VAR_tb_s,VAR_tb_a,VAR_tb_c,VAR_passive,VAR_passive_t, VAR_binge_t,VAR_binge,VAR_educ_t,VAR_educ,VAR_occup_t,VAR_occup,cohortname){
