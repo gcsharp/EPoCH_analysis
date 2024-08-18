@@ -1,9 +1,63 @@
 # EPoCH paper code
 
+require(tidyverse)
+require(reshape2)
+
+setwd("~/OneDrive - University of Exeter/Projects/EPoCH/")
+
 dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/rds/all_results_reduced.rds")
 
-# Summarising sample sizes
+## Creating unstrat (subset of dat for unstratified analyses)
+
 unstrat <-dat[-grep(dat$model_new_name,pattern="stratified"),]
+unstrat$est_SDM <- unstrat$est
+unstrat$est_SDM[unstrat$outcome_type=="binary"]<-unstrat$est[unstrat$outcome_type=="binary"]*0.5513
+
+unstrat$hit_category <- NA
+unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr<0.05]<-"abs(effect)>0.2 & FDR-adj P<0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr<0.05]<-"abs(effect)<0.2 & FDR-adj P<0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr>0.05]<-"abs(effect)<0.2 & FDR-adj P>0.05"
+unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr>0.05]<-"abs(effect)>0.2 & FDR-adj P>0.05"
+unstrat$hit_category <- factor(unstrat$hit_category,ordered=T,levels=c("abs(effect)<0.2 & FDR-adj P>0.05","abs(effect)>0.2 & FDR-adj P>0.05","abs(effect)<0.2 & FDR-adj P<0.05","abs(effect)>0.2 & FDR-adj P<0.05"))
+
+unstrat$person_exposed2 <- NA
+unstrat$person_exposed2[unstrat$person_exposed=="mother"]<-"M"
+unstrat$person_exposed2[unstrat$person_exposed=="partner"]<-"P"
+
+unstrat$exposure_time2 <- NA
+unstrat$exposure_time2[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("early onset")]<-"<12y"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever in\npregnancy"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("preconception")]<-"Before\npregnancy"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in life")]<-"Ever in\nlife"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("at study recruitment")]<-""
+unstrat$exposure_time2[unstrat$exposure_time %in% c("first trimester")]<-"First\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("second trimester")]<-"Second\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("third trimester")]<-"Third\ntrimester"
+unstrat$exposure_time2[unstrat$exposure_time %in% c("first two postnatal years")]<-"After\npregnancy"
+unstrat$exposure_time2 <- factor(unstrat$exposure_time2,ordered=T,levels=c("GRS","<12y","Ever in\nlife","Before\npregnancy","Ever in\npregnancy","First\ntrimester","Second\ntrimester","Third\ntrimester","After\npregnancy",""))
+
+unstrat$exposure_time3 <- NA
+unstrat$exposure_time3[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("early onset")]<-"<12y"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever preg"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("preconception")]<-"Before preg"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in life")]<-"Ever life"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("at study recruitment")]<-"Low SEP"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("first trimester")]<-"First trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("second trimester")]<-"Second trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("third trimester")]<-"Third trim"
+unstrat$exposure_time3[unstrat$exposure_time %in% c("first two postnatal years")]<-"After preg"
+unstrat$exposure_time3 <- factor(unstrat$exposure_time3,ordered=T,levels=c("GRS","<12y","Ever life","Before preg","Ever preg","First trim","Second trim","Third trim","After preg","Low SEP"))
+
+unstrat$exposure_class2 <- NA
+unstrat$exposure_class2[unstrat$exposure_class=="smoking"]<-"Smoking"
+unstrat$exposure_class2[unstrat$exposure_class=="alcohol consumption"]<-"Alcohol consumption"
+unstrat$exposure_class2[unstrat$exposure_class=="caffeine consumption"]<-"Caffeine consumption"
+unstrat$exposure_class2[unstrat$exposure_class=="low socioeconomic position"]<-"Low SEP"
+unstrat$exposure_class2<- factor(unstrat$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
+
+# Summarising sample sizes
 S4TS1 <- unstrat %>% group_by(model_new_name,person_exposed) %>% summarise(n_analyses=length(total_n),n_cohorts_more_1 =sum(cohorts_n>1), pc_cohorts_more_1 =100*(sum(cohorts_n>1)/length(cohorts_n)),mean_n=mean(total_n),min_n=min(total_n),max_n=max(total_n))
 unstrat[unstrat$model=="model2a",] %>% group_by(cohorts_n>1) %>% summarise(n_analyses=length(total_n), mean=mean(total_n),min=min(total_n),max=max(total_n))
 unstrat[unstrat$model=="model2b",] %>% group_by(cohorts_n>1) %>% summarise(n_analyses=length(total_n), mean=mean(total_n),min=min(total_n),max=max(total_n))
@@ -31,13 +85,20 @@ S4TS2$exposure_time[S4TS2$exposure_class=="low sep based on occupation"]<-"occup
 S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on education"]<-"low SEP"
 S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on occupation"]<-"low SEP"
 S4TS2$exposure_time<-factor(S4TS2$exposure_time,ordered=T,levels=c("education","occupation","ever in life","early onset (before age 12)","preconception","first trimester","second trimester","third trimester","ever in pregnancy","first two postnatal years"))
+
+pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Barchart.pdf",width=7.5,height=6.5)
+
 ggplot(S4TS2,aes(x=exposure_time,y=pclevel))+
   geom_col(fill="aquamarine4")+
   geom_text(size=3,aes(y=pclevel+6,label=paste0(round(pclevel),"%")))+
   coord_flip()+
   facet_grid(exposure_class~parent,space = "free",scales="free")+
   xlab("")+ylab("Percentage in exposed group")+
-  theme_grey()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank() )
+  theme_classic()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
+                        strip.background = element_rect(fill = "grey90",colour="white"),
+                        strip.placement = "inside") 
+
+dev.off()
 
 ## Function to make cohort summaries
 make_cohort_summary <- function(VAR_b_s,VAR_o_s,VAR_o_a,VAR_b_a,VAR_o_c,VAR_b_c,VAR_to_s,VAR_to_a,VAR_to_c,VAR_tb_s,VAR_tb_a,VAR_tb_c,VAR_passive,VAR_passive_t, VAR_binge_t,VAR_binge,VAR_educ_t,VAR_educ,VAR_occup_t,VAR_occup,cohortname){
@@ -252,69 +313,200 @@ write.csv(WIDE,file="cohort_summaries_n.csv")
 
 # Summarising effect sizes and p-values
 
-## adding info to unstrat
+reverse_vars <- c("verbal intelligence","total intelligence","spatial awareness",
+                  "school readiness","reading skills","problem solving","performance intelligence",
+                  "number skills","naming vocabulary","prosocial behaviour","birthweight")
+unstrat$direction <- sign(unstrat$est)
+unstrat$direction[unstrat$outcome_subclass2 %in% reverse_vars] <- unstrat$direction[unstrat$outcome_subclass2 %in% reverse_vars]*-1
 
-unstrat$est_SDM <- unstrat$est
-unstrat$est_SDM[unstrat$outcome_type=="binary"]<-unstrat$est[unstrat$outcome_type=="binary"]*0.5513
 
-unstrat$hit_category <- NA
-unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr<0.05]<-"abs(effect)>0.2 & FDR-adj P<0.05"
-unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr<0.05]<-"abs(effect)<0.2 & FDR-adj P<0.05"
-unstrat$hit_category[abs(unstrat$est_SDM)<0.2 & unstrat$fdr>0.05]<-"abs(effect)<0.2 & FDR-adj P>0.05"
-unstrat$hit_category[abs(unstrat$est_SDM)>=0.2 & unstrat$fdr>0.05]<-"abs(effect)>0.2 & FDR-adj P>0.05"
-unstrat$hit_category <- factor(unstrat$hit_category,ordered=T,levels=c("abs(effect)<0.2 & FDR-adj P>0.05","abs(effect)>0.2 & FDR-adj P>0.05","abs(effect)<0.2 & FDR-adj P<0.05","abs(effect)>0.2 & FDR-adj P<0.05"))
+## summarising hits by outcome and exposure class and time, model 2a
 
-unstrat$person_exposed2 <- NA
-unstrat$person_exposed2[unstrat$person_exposed=="mother"]<-"M"
-unstrat$person_exposed2[unstrat$person_exposed=="partner"]<-"P"
-
-unstrat$exposure_time2 <- NA
-unstrat$exposure_time2[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("early onset")]<-"<12y"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever in\npregnancy"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("preconception")]<-"Before\npregnancy"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("ever in life")]<-"Ever in\nlife"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("at study recruitment")]<-""
-unstrat$exposure_time2[unstrat$exposure_time %in% c("first trimester")]<-"First\ntrimester"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("second trimester")]<-"Second\ntrimester"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("third trimester")]<-"Third\ntrimester"
-unstrat$exposure_time2[unstrat$exposure_time %in% c("first two postnatal years")]<-"After\npregnancy"
-unstrat$exposure_time2 <- factor(unstrat$exposure_time2,ordered=T,levels=c("GRS","<12y","Ever in\nlife","Before\npregnancy","Ever in\npregnancy","First\ntrimester","Second\ntrimester","Third\ntrimester","After\npregnancy",""))
-
-unstrat$exposure_time3 <- NA
-unstrat$exposure_time3[unstrat$exposure_time %in% c("age at initiation","alcohol","caffeine","cessation","heaviness","initiation")]<-"GRS"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("early onset")]<-"<12y"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in pregnancy")]<-"Ever preg"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("preconception")]<-"Before preg"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("ever in life")]<-"Ever life"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("at study recruitment")]<-"Low SEP"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("first trimester")]<-"First trim"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("second trimester")]<-"Second trim"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("third trimester")]<-"Third trim"
-unstrat$exposure_time3[unstrat$exposure_time %in% c("first two postnatal years")]<-"After preg"
-unstrat$exposure_time3 <- factor(unstrat$exposure_time3,ordered=T,levels=c("GRS","<12y","Ever life","Before preg","Ever preg","First trim","Second trim","Third trim","After preg","Low SEP"))
-
-unstrat$exposure_class2 <- NA
-unstrat$exposure_class2[unstrat$exposure_class=="smoking"]<-"Smoking"
-unstrat$exposure_class2[unstrat$exposure_class=="alcohol consumption"]<-"Alcohol consumption"
-unstrat$exposure_class2[unstrat$exposure_class=="caffeine consumption"]<-"Caffeine consumption"
-unstrat$exposure_class2[unstrat$exposure_class=="low socioeconomic position"]<-"Low SEP"
-unstrat$exposure_class2<- factor(unstrat$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
-
-## summarising hits by exposure time
-
-df <- droplevels(unstrat[unstrat$model=="model2b",])
 require(ggh4x)
-ggplot(df,aes(x=person_exposed2,fill=hit_category))+
-  geom_bar(position="fill")+
-  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
-  facet_nested(.~exposure_class2+exposure_time2,space="free",scales="free")+
-  xlab("Exposed parent")+ylab("Proportion of results")+
-  theme_classic()+
-  theme(strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
-        legend.position="bottom",legend.title=element_blank())
 
-# summarising hits  by model (supplementary material)
+df1 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed","exposure_time3","hit_category","direction","outcome_class")] %>%
+  group_by(direction,person_exposed,exposure_class2,exposure_time3,outcome_class,hit_category) %>%
+  summarise(count=length(hit_category))
+
+df2 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed","exposure_time3","outcome_class")] %>%
+  group_by(person_exposed,exposure_class2,exposure_time3,outcome_class) %>%
+  summarise(count=length(outcome_class))
+
+df <- left_join(df1,df2,by=c("exposure_class2","person_exposed","exposure_time3","outcome_class"))
+
+df$percent <- 100*(df$count.x/df$count.y)
+df$percent_sign <- df$percent*df$direction
+
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Percentage_hits_all.pdf",width=12,height=8.5)
+
+ggplot(df,aes(x=percent_sign,y=person_exposed))+
+  geom_col(aes(fill=hit_category))+
+  geom_vline(xintercept = 0)+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(exposure_class2+outcome_class~exposure_time3)+
+  ylab("")+xlab("%")+
+  labs(tag = "<-- associated with better child outcomes | associated with worse child outcomes -->") +
+  theme_minimal()+theme(strip.text.y = element_text(angle=0,hjust=0),
+                        axis.text.x=element_text(size=6,angle=90,hjust=1),
+                        panel.spacing.x = unit(0.1,"lines"),panel.spacing.y = unit(0.2,"lines"),
+                        legend.position = "bottom", legend.title=element_blank(),
+                        ggh4x.facet.nestline = element_line(),
+                        plot.tag.position = c(0.41,0.06),
+                        plot.tag = element_text(size=12),
+                        panel.grid.minor.y = element_blank(),
+                        panel.grid.major.y=element_blank())
+
+dev.off()
+
+
+## summarising hits by exposure class and time
+
+df1 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","hit_category","direction","outcome_class")] %>%
+  group_by(direction,person_exposed2,exposure_class2,exposure_time3,hit_category) %>%
+  summarise(count=length(hit_category))
+
+df2 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","outcome_class")] %>%
+  group_by(person_exposed2,exposure_class2,exposure_time3) %>%
+  summarise(count=length(exposure_time3))
+
+df <- left_join(df1,df2,by=c("exposure_class2","person_exposed2","exposure_time3"))
+
+df$percent <- 100*(df$count.x/df$count.y)
+df$percent_sign <- df$percent*df$direction
+
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Percentage_hits_expclass_exptime.pdf",width=17,height=4)
+
+ggplot(df,aes(y=percent_sign,x=person_exposed2))+
+  geom_col(aes(fill=hit_category))+
+  geom_hline(yintercept = 0)+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(.~exposure_class2+exposure_time3)+
+  xlab("")+ylab("%")+
+  labs(tag = "<-- associated with better child outcomes | associated with worse child outcomes -->") +
+  theme_minimal()+theme(strip.text.y = element_text(angle=0,hjust=0),
+                        panel.spacing.y = unit(0.1,"lines"),panel.spacing.x = unit(0.2,"lines"),
+                        legend.position = "bottom", legend.title=element_blank(),
+                        ggh4x.facet.nestline = element_line(),
+                        plot.tag.position = c(-0.009,0.5),
+                        plot.tag = element_text(size=6.5,angle=90),
+                        panel.grid.minor.x = element_blank(),
+                        panel.grid.major.x=element_blank(),
+                        plot.margin = unit(c(0,0.5,0,0.6), "cm"))
+dev.off()
+
+## summarising hits by exposure class and outcome class
+
+df1 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","hit_category","direction","outcome_class")] %>%
+  group_by(direction,person_exposed2,exposure_class2,outcome_class,hit_category) %>%
+  summarise(count=length(hit_category))
+
+df2 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","outcome_class")] %>%
+  group_by(person_exposed2,exposure_class2,outcome_class) %>%
+  summarise(count=length(exposure_class2))
+
+df <- left_join(df1,df2,by=c("exposure_class2","person_exposed2","outcome_class"))
+
+df$percent <- 100*(df$count.x/df$count.y)
+df$percent_sign <- df$percent*df$direction
+
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Percentage_hits_expclass_outclass.pdf",width=6,height=7.5)
+
+ggplot(df,aes(y=percent_sign,x=person_exposed2))+
+  geom_col(aes(fill=hit_category))+
+  geom_hline(yintercept = 0)+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(exposure_class2~outcome_class)+
+  xlab("")+ylab("%")+
+  guides(fill=guide_legend(nrow=2,byrow=TRUE))+
+  labs(tag = "<-- associated with better child outcomes | associated with worse child outcomes -->") +
+  theme_minimal()+theme(strip.text.y = element_text(angle=0,hjust=0),
+                        panel.spacing.y = unit(0.1,"lines"),panel.spacing.x = unit(0.2,"lines"),
+                        legend.position = "bottom", legend.title=element_blank(),
+                        ggh4x.facet.nestline = element_line(),
+                        plot.tag.position = c(-0.02,0.5),
+                        plot.tag = element_text(size=8,angle=90),
+                        panel.grid.minor.x = element_blank(),
+                        panel.grid.major.x=element_blank(),
+                        strip.text.x=element_text(angle=90,hjust=0),
+                        plot.margin = unit(c(0,0.5,0,0.6), "cm"))
+dev.off()
+
+
+## summarising hits by outcome class and outcome time
+
+df1 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","hit_category","direction","outcome_class","outcome_time")] %>%
+  group_by(direction,person_exposed2,outcome_time,outcome_class,hit_category) %>%
+  summarise(count=length(hit_category))
+
+df2 <- unstrat[unstrat$model=="model2a",c("exposure_class2","person_exposed2","exposure_time3","outcome_class","outcome_time")] %>%
+  group_by(person_exposed2,outcome_time,outcome_class) %>%
+  summarise(count=length(outcome_class))
+
+df <- left_join(df1,df2,by=c("outcome_time","person_exposed2","outcome_class"))
+
+df$percent <- 100*(df$count.x/df$count.y)
+df$percent_sign <- df$percent*df$direction
+
+df$outcome_time <- factor(df$outcome_time, ordered=T,levels=c("delivery","first year","age 1 to 2","age 3 to 4","age 5 to 7","age 8 to 11", "any time in childhood"))
+
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Percentage_hits_outtime_outclass.pdf",width=6,height=9)
+
+ggplot(df,aes(y=percent_sign,x=person_exposed2))+
+  geom_col(aes(fill=hit_category))+
+  geom_hline(yintercept = 0)+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(outcome_class~outcome_time)+
+  xlab("")+ylab("%")+
+  guides(fill=guide_legend(nrow=2,byrow=TRUE))+
+  labs(tag = "<-- associated with better child outcomes | associated with worse child outcomes -->") +
+  theme_minimal()+theme(strip.text.y = element_text(angle=0,hjust=0),
+                        panel.spacing.y = unit(0.1,"lines"),panel.spacing.x = unit(0.2,"lines"),
+                        legend.position = "bottom", legend.title=element_blank(),
+                        ggh4x.facet.nestline = element_line(),
+                        plot.tag.position = c(-0.02,0.5),
+                        plot.tag = element_text(size=8,angle=90),
+                        panel.grid.minor.x = element_blank(),
+                        panel.grid.major.x=element_blank(),
+                        strip.text.x=element_text(angle=90,hjust=0),
+                        plot.margin = unit(c(0,0.5,0,0.6), "cm"))
+dev.off()
+
+## summarising hits by model
+
+df1 <- unstrat[,c("exposure_class2","person_exposed2","exposure_time3","hit_category","direction","outcome_class","outcome_time","model")] %>%
+  group_by(direction,person_exposed2,exposure_class2,model,hit_category) %>%
+  summarise(count=length(hit_category))
+
+df2 <- unstrat[,c("exposure_class2","person_exposed2","exposure_time3","outcome_class","outcome_time","model")] %>%
+  group_by(person_exposed2,model,exposure_class2) %>%
+  summarise(count=length(exposure_time3))
+
+df <- left_join(df1,df2,by=c("model","person_exposed2","exposure_class2"))
+
+df$percent <- 100*(df$count.x/df$count.y)
+df$percent_sign <- df$percent*df$direction
+
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Percentage_hits_model.pdf",width=6,height=7)
+
+ggplot(df,aes(y=percent_sign,x=person_exposed2))+
+  geom_col(aes(fill=hit_category))+
+  geom_hline(yintercept = 0)+
+  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
+  facet_nested(exposure_class2~model)+
+  xlab("")+ylab("%")+
+  guides(fill=guide_legend(nrow=2,byrow=TRUE))+
+  labs(tag = "<-- associated with better child outcomes | associated with worse child outcomes -->") +
+  theme_minimal()+theme(strip.text.y = element_text(angle=0,hjust=0),
+                        panel.spacing.y = unit(0.1,"lines"),panel.spacing.x = unit(0.2,"lines"),
+                        legend.position = "bottom", legend.title=element_blank(),
+                        ggh4x.facet.nestline = element_line(),
+                        plot.tag.position = c(-0.02,0.5),
+                        plot.tag = element_text(size=8,angle=90),
+                        panel.grid.minor.x = element_blank(),
+                        panel.grid.major.x=element_blank(),
+                        strip.text.x=element_text(angle=90,hjust=0),
+                        plot.margin = unit(c(0,0.5,0,0.6), "cm"))
+dev.off()
 
 ## distribution of effect estimates and p-values for mothers and partners
 
@@ -367,15 +559,6 @@ res$exposure_class2[res$exposure_class=="alcohol consumption"]<-"Alcohol consump
 res$exposure_class2[res$exposure_class=="caffeine consumption"]<-"Caffeine consumption"
 res$exposure_class2[res$exposure_class=="low socioeconomic position"]<-"Low SEP"
 res$exposure_class2<- factor(res$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
-
-ggplot(res,aes(x=parent,y=counts,fill=category))+
-  geom_col(position="fill")+
-  facet_grid(exposure_class~model,space="free",scales="free")+
-  scale_fill_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
-  xlab("Exposed parent")+ylab("Proportion of results")+
-  theme_classic()+
-  theme(strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
-        legend.position="bottom",legend.title=element_blank())
 
 ## Text for main body:
 res %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
@@ -461,17 +644,21 @@ mt_m$exposure <- paste(mt_m$exposure_class2,mt_m$exposure_subclass,mt_m$exposure
 mt_m$outcome <- paste(mt_m$outcome_class,mt_m$outcome_subclass2,mt_m$outcome_time)
 mt_m$exposure_class <- factor(mt_m$exposure_class2, ordered=T, levels=c("Smoking","Alcohol consumption", "Caffeine consumption","Low SEP"))
 
+pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Coefficients.pdf",width=12,height=10)
+
 ggplot(mt_m,aes(y=outcome_subclass2,x=est_SDM,colour=hit_category))+
   geom_jitter(aes(alpha=as.numeric(hit_category)*0.25))+
   geom_vline(xintercept=0)+
  scale_colour_manual(values=c("#c2a5cf","#a6dba0","#7b3294","#008837"))+
   facet_nested(outcome_class~exposure_class+person_exposed,space = "free_y",scales="free_y")+
-  theme_classic()+xlab("Standardised effect estimate (Cohen's D)")+ylab("Child outcomes")+
+  theme_classic()+xlab("Standardised effect estimate (Cohen's D)")+ylab("")+
   guides(alpha = "none")+
   theme(strip.text.y=element_blank(),strip.background = element_blank(),ggh4x.facet.nestline = element_line(),
         legend.position="bottom",legend.title=element_blank(),
         legend.margin=margin(0,0,0,0),
         legend.box.margin=margin(-10,-10,-10,-10))
+
+dev.off()
 
 
 # triangulation with heatmap DURING PREGNANCY
@@ -482,10 +669,10 @@ dim(DIM[DIM$person_exposed=="partner",])
 dim(DIM[DIM$person_exposed=="mother"&DIM$fdr<0.05,])
 dim(DIM[DIM$person_exposed=="partner"&DIM$fdr<0.05,])
 
-source("OneDrive - University of Exeter/Projects/EPoCH/triangulation.R")
+source("OneDrive - University of Exeter/Projects/EPoCH/EPoCH analysis/triangulation.R")
 
-T_mothers_preg <-triangulate_results(unstrat,"mother",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
-T_partners_preg <-triangulate_results(unstrat,"partner",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
+T_mothers_preg <-triangulate_results(unstrat,"mother",c("ever in pregnancy"),"postnatal")
+T_partners_preg <-triangulate_results(unstrat,"partner",c("ever in pregnancy"),"postnatal")
 T_both_preg<-combine_triang_results(T_mothers_preg,T_partners_preg)
 
 T_mothers_precon_post <-triangulate_results(unstrat,"mother","preconception","postnatal")
@@ -500,6 +687,7 @@ saveRDS(T_both_preg,"OneDrive - University of Exeter/Projects/EPoCH/EPoCH result
 
 
 # plot
+require(reshape2)
 
 my_strips <- strip_nested(
   # Horizontal strips
@@ -517,6 +705,8 @@ FDR_insig_w$all_insig <- rowSums(FDR_insig_w[,-1])==6
 FDR_insig <- as.character(FDR_insig_w$Var1[FDR_insig_w$all_insig])
 
 data_to_plot <- droplevels(T_both_preg[(T_both_preg$outcome %in% FDR_insig)==F,])
+
+pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Triangulation.pdf",width=10,height=17)
 
 ggplot(data_to_plot,aes(x=variable2,y=outcome_subclass))+
   geom_tile(aes(fill=factor(value)))+
@@ -536,12 +726,16 @@ ggplot(data_to_plot,aes(x=variable2,y=outcome_subclass))+
         legend.margin=margin(0,0,0,0),
         legend.box.spacing = unit(0, "pt"))
 
+dev.off()
 
 T_both_preg[which(T_both_preg$value=="5 lines\nof evidence"),]->Pregnancy_outcomes
 T_both_precon_preg[which(T_both_precon_preg$value=="5 lines\nof evidence"),]->Precon_Preg_outcomes
-T_both_precon_post[which(T_both_precon_post$value=="5 lines\nof evidence"),]->Precon_Preg_outcomes
+T_both_precon_post[which(T_both_precon_post$value=="5 lines\nof evidence"),]->Postcon_Preg_outcomes
 
 # now compare these with effect of SEP to contextualise evidence
 
 apply(Pregnancy_outcomes,1,paste,collapse="_")[apply(Pregnancy_outcomes,1,function(x){paste(x,collapse="_") %in% apply(Prenatal_outcomes,1,paste,collapse="_")})]
+
+
+
 

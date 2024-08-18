@@ -1,4 +1,14 @@
-# triangulate function
+# triangulate function and z-test
+
+Z_test <- function(beta_poi,beta_cop,se_poi,se_cop){
+  difference <- beta_poi - beta_cop
+  se_difference <- sqrt(se_poi^2 + se_cop^2)
+  z_score <- difference / se_difference
+  z_score
+  p_value <- 2 * pnorm(-abs(z_score))
+  p_value
+}
+
 
 triangulate_results <- function(unstrat,parent,timing,comparisontiming){
 ## Creating MatPat again (because we need the original versions of exposure_class and exposure_time (not the versions used above))
@@ -12,6 +22,8 @@ matpat$samedir_diff <- matpat$diff
 matpat$samedir_diff[matpat$samedir==F]<-NA
 matpat$samedir_pc_change <- (abs(matpat$samedir_diff)/abs(matpat$estmat))*100
 matpat$pc_change <- (abs(matpat$diff)/abs(matpat$estmat))*100
+matpat$Z_p <- apply(matpat[,c("estmat","estpat","semat","sepat")],1,function(x){
+  Z_test(beta_poi=as.numeric(x[1]),beta_cop=as.numeric(x[2]),se_poi=as.numeric(x[3]),se_cop=as.numeric(x[4]))})
 
 ## MVR
 top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
@@ -37,7 +49,7 @@ tdat_c <- tdat_c %>% group_by(outcome) %>% summarise(sign=median(sign),Psig=ceil
 #tdat_c <- tdat_c[which(tdat_c$sign%in%c(-1,1)),]
 
 ## GRS
-top_hits_grs <- unstrat[unstrat$exposure_subclass=="genetic risk score"&unstrat$p<0.05,] #GRS any model (not specifying model because not clear which is best - adj for child outcome may be appropriate, but can introduce colider bias, adjusting for partner can potentially counteract, but not available for everyone, also analyses are underpowered, so it may be best to take the least adjusted model)
+top_hits_grs <- unstrat[unstrat$exposure_subclass=="genetic risk score"&unstrat$p<0.05&unstrat$model=="model2a",] #GRS any model (not specifying model because not clear which is best - adj for child outcome may be appropriate, but can introduce colider bias, adjusting for partner can potentially counteract, but not available for everyone, also analyses are underpowered, so it may be best to take the least adjusted model - DECIDED ON THAT IN THE END)
 top_hits_grs$combination <- apply(top_hits_grs[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
                                   1,paste,collapse="_")
 top_hits_grs_m <- top_hits_grs[top_hits_grs$person_exposed==parent,]
@@ -94,8 +106,8 @@ tdat_a <- merge(tdat_a,tdat_a_dose,by="outcome",all.x=T,all.y=T)
 tdat_c <- merge(tdat_c,tdat_c_dose,by="outcome",all.x=T,all.y=T)
 
 ## TIMING (comparing the time of interest to postnatal or during pregnancy)
-ModelTime <- "model3a"
-if(any(timing%in%"preconception")){ModelTime <- "model2a"} #take the model adjusted for previous timepoints, but if timing==preconception, there is no previous timepoint, so take model2a for that one
+ModelTime <- "model2a"
+#if(any(timing%in%"preconception")){ModelTime <- "model2a"} #take the model adjusted for previous timepoints (3a), but if timing==preconception, there is no previous timepoint, so take model2a for that one
 timeofinterest <- unstrat[which(unstrat$exposure_time%in%timing&unstrat$model==ModelTime),]
 
 ComparisonTime <-c("ever in pregnancy","first trimester","second trimester","third trimester")
@@ -141,7 +153,7 @@ matpat$poi_est <- matpat$estmat
   matpat$poi_est <- matpat$estpat
 }
 
-top_hits_negcon_m <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$poi_p<0.05 & matpat$samedir==T & matpat$poi_diff==T& matpat$model=="model2b",] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05
+top_hits_negcon_m <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$poi_p<0.05 & matpat$samedir==T & matpat$poi_diff==T& matpat$model=="model2b" ,] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05, and P for diff between estimates Z_p<0.05.
 
 top_hits_negcon_m$combination <- apply(top_hits_negcon_m[,c("outcome_classmat","outcome_subclass1mat","outcome_subclass2mat","outcome_timemat","outcome_typemat")],
                                        1,paste,collapse="_")
@@ -257,6 +269,7 @@ tdat_c_melt$parent<-parent
 tdat <- bind_rows(mget(intersect(ls(), c("tdat_s_melt","tdat_a_melt","tdat_c_melt"))))
 
 tdat$outcome_class <- unlist(lapply(lapply(lapply(tdat$outcome,stringr::str_split,pattern = "_"),unlist),"[",1))
+tdat$outcome_subclass2 <- unlist(lapply(lapply(lapply(tdat$outcome,stringr::str_split,pattern = "_"),unlist),"[",3))
 tdat$outcome_subclass <- paste(unlist(lapply(lapply(lapply(tdat$outcome,stringr::str_split,pattern = "_"),unlist),"[",3)),
                                        unlist(lapply(lapply(lapply(tdat$outcome,stringr::str_split,pattern = "_"),unlist),"[",4)),
                                        sep=" at ") 
@@ -285,51 +298,3 @@ combine_triang_results<-function(x,y){
   both$T[both$variable2=="T"]<-"Yes"
   both
 }
-
-T_mothers_preg <-triangulate_results(unstrat,"mother",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
-T_partners_preg <-triangulate_results(unstrat,"partner",c("ever in pregnancy","first trimester","second trimester","third trimester"),"postnatal")
-T_both_preg<-combine_triang_results(T_mothers_preg,T_partners_preg)
-
-T_mothers_precon_post <-triangulate_results(unstrat,"mother","preconception","postnatal")
-T_partners_precon_post <-triangulate_results(unstrat,"partner","preconception","postnatal")
-T_both_precon_post<-combine_triang_results(T_mothers_precon_post,T_partners_precon_post)
-
-T_mothers_precon_preg <-triangulate_results(unstrat,"mother","preconception","during pregnancy")
-T_partners_precon_preg <-triangulate_results(unstrat,"partner","preconception","during pregnancy")
-T_both_precon_preg<-combine_triang_results(T_mothers_precon_preg,T_partners_precon_preg)
-
-# plot
-
-my_strips <- strip_nested(
-  # Horizontal strips
-  text_x = elem_list_text(colour = c("black", "black","white"),size=c(10,10,1)),
-  by_layer_x = TRUE
-)
-
-cols <- c("negative\nassociation" = "#fc8d59", "positive\nassociation" = "#91bfdb","0 lines\nof evidence" = "grey90", "1 line\nof evidence" = "#edf8e9", "2 lines\nof evidence" = "#bae4b3", "3 lines\nof evidence"="#74c476", "4 lines\nof evidence"="#31a354", "5 lines\nof evidence"="#006d2c")
-
-ggplot(T_both_preg,aes(x=variable2,y=outcome_subclass))+
-  geom_tile(aes(fill=factor(value)))+
-  scale_fill_manual(values = cols,na.translate=F)+
-  facet_nested(outcome_class~exposure+parent+T,scales = "free",space="free",strip = my_strips)+
-  theme_minimal()+
-  guides(colour="none",fill = guide_legend(byrow = TRUE))+
-  theme(axis.text=element_text(size=8),axis.title=element_blank(),
-        panel.spacing.y = unit(0.1, "lines"),
-    #    panel.spacing.x = unit(c(0.1,0.3,0.1,2,0.1,0.3,0.1,2,0.1,0.3,0.1), "lines"),
-        panel.grid.major.x=element_blank(),
-        panel.grid.major.y=element_line(linewidth=0.2),
-        strip.text.y=element_text(size=0),
-        strip.text.x=element_text(margin=margin(b=0,t=0)),
-        legend.title=element_blank(),legend.text=element_text(size=8),
-        legend.key.spacing.y = unit(1.5, "lines"),
-        legend.margin=margin(0,0,0,0),
-        legend.box.spacing = unit(0, "pt"))
-
-
-
-
-
-
-
-
