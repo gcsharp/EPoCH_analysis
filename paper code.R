@@ -5,6 +5,52 @@ require(reshape2)
 
 setwd("~/OneDrive - University of Exeter/Projects/EPoCH/")
 
+# correlate SEP with health behaviours
+alspac <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/alspac/alspac_pheno.rds")
+bib <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/bib/bib_pheno.rds")
+mcs <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/mcs/mcs_pheno.rds")
+
+variable_strings <- "edu_|occup_|smoking_father_ever_pregnancy_binary|alcohol_father_ever_pregnancy_binary|caffeine_father_total_ever_pregnancy_continuous|smoking_mother_ever_pregnancy_binary|alcohol_mother_ever_pregnancy_binary|caffeine_mother_total_ever_pregnancy_continuous"
+correlate_SEP <- function(cohort){
+  df <- cohort[,grepl(variable_strings,colnames(cohort))]
+  cor(df,use="pairwise.complete")
+}
+
+alspac_cor <- as.data.frame(melt(correlate_SEP(alspac)))
+bib_cor <- as.data.frame(melt(correlate_SEP(bib)))
+mcs_cor <- as.data.frame(melt(correlate_SEP(mcs)))
+all_cor <-list(alspac_cor,bib_cor,mcs_cor)
+names(all_cor) <- c("alspac","bib","mcs")
+
+all_cor <- bind_rows(all_cor,.id = "cohort")
+all_cor <- droplevels(all_cor[grepl("occup|edu",all_cor$Var1)&grepl("alcohol|smoking|caffeine",all_cor$Var2),])
+all_cor <- all_cor[-which(all_cor$Var2 %in% c("smoking_father_ever_pregnancy_binary","alcohol_father_ever_pregnancy_binary","caffeine_father_total_ever_pregnancy_continuous")),]
+all_cor <- all_cor[grepl("mreport",all_cor$Var2)==F,]
+all_cor <- all_cor[grepl("highestlowest",all_cor$Var1)==F,]
+
+all_cor$parent <- unlist(lapply(str_split(all_cor$Var2,pattern="_"),"[",2))
+all_cor$behaviour <- unlist(lapply(str_split(all_cor$Var2,pattern="_"),"[",1))
+all_cor$sep_parent <- unlist(lapply(str_split(all_cor$Var1,pattern="_"),"[",3))
+all_cor$sep_type <- unlist(lapply(str_split(all_cor$Var1,pattern="_"),"[",2))
+
+
+pdf("Paper/Figures/SEP_comparisons.pdf",width=5,height=5)
+require(scales)
+require(ggh4x)
+ggplot(all_cor,aes(x=sep_parent,y=parent))+
+  geom_tile(aes(fill=value))+
+  geom_text(aes(label=round(value,2)))+
+  scale_fill_gradient2(low = muted("blue"),
+                    mid = "white",
+                    high = muted("red"),
+                    midpoint = 0,
+                    name="correlation")+
+  facet_nested(cohort+behaviour~sep_type,scales="free",space="free")+
+  theme_minimal()+xlab("")+ylab("")+
+  theme(strip.text.y=element_text(angle=0,hjust=0),ggh4x.facet.nestline = element_line())
+dev.off()
+##
+
 dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/rds/all_results_reduced.rds")
 
 ## Creating unstrat (subset of dat for unstratified analyses)
