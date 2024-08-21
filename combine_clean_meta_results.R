@@ -2,7 +2,7 @@
 require(tidyverse)
 filenames <- list.files("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/meta_analysis_results/")
 filenames <- filenames[grep("extracted",filenames)]
-filenames <- filenames[-grep("1c|2c|3c|4c",filenames)]
+#filenames <- filenames[-grep("1c|2c|3c|4c",filenames)]
 filenames <- paste0("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/meta_analysis_results/",filenames)
 
 files <- lapply(filenames,readRDS)
@@ -12,7 +12,7 @@ combined <- bind_rows(files)
 # save
 saveRDS(combined,"~/Library/CloudStorage/OneDrive-SharedLibraries-UniversityofBristol/grp-EPoCH - Documents/EPoCH GitHub/all_results.rds") #"~/Library/CloudStorage/OneDrive-SharedLibraries-UniversityofBristol/grp-EPoCH - Documents/EPoCH GitHub/all_results.rds"
 saveRDS(combined,"~/University of Bristol/grp-EPoCH - Documents/EPoCH GitHub/all_results.rds") 
-
+saveRDS(combined,"~/OneDrive - University of Exeter/Projects/EPoCH/all_results.rds")
 
 # # add bib_sa and bib_we results REMOVE THIS AS BIB WE AND SE ARE NOT SHOWING DIFFERENT CONFOUNDING STRUCTURES
 # 
@@ -99,7 +99,7 @@ combined_cleaned <- combined_cleaned[-which(
 ),]
 
 # remove age and sex adjusted BMI  as it's confusing and the results are similar to non-adjusted (and we adjust for age and sex in the model anyway)
-combined_cleaned <- combined_cleaned[-which(combined_cleaned$outcome_subclass2=="age and sex adjusted BMI"),]
+#combined_cleaned <- combined_cleaned[-which(combined_cleaned$outcome_subclass2=="age and sex adjusted BMI"),]
 # remove results related to physical activity or diet (for app)
 combined_cleaned <- combined_cleaned[-which(combined_cleaned$exposure_class %in% c("physical activity","diet")),]
 # and results for perinatal survival outcomes
@@ -148,6 +148,9 @@ combined_cleaned <- change_terminology("conduct problems","binary","conduct prob
 
 combined_cleaned <- change_terminology("behaviour and affect","continuous","depressive symptoms")
 combined_cleaned$outcome_subclass1[combined_cleaned$outcome_subclass2=="depressive symptoms"]<-"behaviour and affect"
+
+# change terminology of behaviour and affect
+combined_cleaned[] <- lapply(combined_cleaned, gsub, pattern = "behaviour and affect", replacement = "behaviour and emotions", fixed = TRUE)
 
 # change terminology of SEP and SEP 'dose' (change dose to level?)
 combined_cleaned[] <- lapply(combined_cleaned, gsub, pattern = "socioeconomic position", replacement = "low socioeconomic position", fixed = TRUE)
@@ -208,6 +211,8 @@ combined_cleaned[,numeric_cols] <- apply(combined_cleaned[,numeric_cols],2,as.nu
 #tidying up
 combined_cleaned$total_n_exposure[combined_cleaned$total_n_exposure==0]<-NA
 combined_cleaned$total_n_outcome[combined_cleaned$total_n_outcome==0]<-NA
+
+combined_cleaned <- combined_cleaned[is.na(combined_cleaned$est)==F,]
 
 ## NO LONGER AN ISSUE AFTER QC OF THE COHORT RESULTS INDIVIDUALLY
 # QC of cohort results (remove anything where there's evidence of the model not converging, probably because a single explanatory variable (exposure or covariate), uniquely identifies the outcome, i.e. perfect prediction/complete separation.)

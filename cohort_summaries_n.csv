@@ -1,0 +1,366 @@
+"","cohort","exposure_dose","time","mother","partner"
+"1","ALSPAC","Smoking: active (any)","early onset","150/11472 (1%)","300/9336 (3%)"
+"2","ALSPAC","Smoking: active (any)","ever in life","5754/11546 (50%)","4809/8845 (54%)"
+"3","ALSPAC","Smoking: active (any)","ever in pregnancy","3042/10896 (28%)","3438/7457 (46%)"
+"4","ALSPAC","Smoking: active (any)","first trimester","2710/11573 (23%)","-Inf/-Inf (NaN%)"
+"5","ALSPAC","Smoking: active (any)","first two postnatal years","2818/10872 (26%)","2138/7445 (29%)"
+"6","ALSPAC","Smoking: active (any)","preconception","3761/11618 (32%)","4186/11231 (37%)"
+"7","ALSPAC","Smoking: active (any)","second trimester","1903/10558 (18%)","2469/7835 (32%)"
+"8","ALSPAC","Smoking: active (any)","third trimester","2413/11712 (21%)","2124/7863 (27%)"
+"9","ALSPAC","Smoking: active (heavy)","first trimester","409/11573 (4%)","-Inf/-Inf (NaN%)"
+"10","ALSPAC","Smoking: active (heavy)","first two postnatal years","701/10872 (6%)","761/7445 (10%)"
+"11","ALSPAC","Smoking: active (heavy)","preconception","1080/11522 (9%)","1472/11123 (13%)"
+"12","ALSPAC","Smoking: active (heavy)","second trimester","264/10558 (3%)","800/7835 (10%)"
+"13","ALSPAC","Smoking: active (heavy)","third trimester","400/11712 (3%)","758/7863 (10%)"
+"14","ALSPAC","Smoking: active (light)","first trimester","1212/11573 (10%)","-Inf/-Inf (NaN%)"
+"15","ALSPAC","Smoking: active (light)","first two postnatal years","887/10872 (8%)","515/7445 (7%)"
+"16","ALSPAC","Smoking: active (light)","preconception","981/11522 (9%)","1104/11123 (10%)"
+"17","ALSPAC","Smoking: active (light)","second trimester","868/10558 (8%)","710/7835 (9%)"
+"18","ALSPAC","Smoking: active (light)","third trimester","1017/11712 (9%)","438/7863 (6%)"
+"19","ALSPAC","Smoking: active (moderate)","first trimester","1089/11573 (9%)","-Inf/-Inf (NaN%)"
+"20","ALSPAC","Smoking: active (moderate)","first two postnatal years","1230/10872 (11%)","862/7445 (12%)"
+"21","ALSPAC","Smoking: active (moderate)","preconception","1604/11522 (14%)","1502/11123 (14%)"
+"22","ALSPAC","Smoking: active (moderate)","second trimester","771/10558 (7%)","959/7835 (12%)"
+"23","ALSPAC","Smoking: active (moderate)","third trimester","996/11712 (9%)","928/7863 (12%)"
+"24","ALSPAC","Alcohol: any (any)","ever in pregnancy","8110/11166 (73%)","10851/11305 (96%)"
+"25","ALSPAC","Alcohol: any (any)","first trimester","6342/11521 (55%)",NA
+"26","ALSPAC","Alcohol: any (any)","first two postnatal years","10035/11337 (89%)","8183/8603 (95%)"
+"27","ALSPAC","Alcohol: any (any)","preconception","10662/11549 (92%)","8547/8861 (96%)"
+"28","ALSPAC","Alcohol: any (any)","second trimester","5697/11307 (50%)","8336/8745 (95%)"
+"29","ALSPAC","Alcohol: any (any)","third trimester","5577/10843 (51%)","7121/7818 (91%)"
+"30","ALSPAC","Alcohol: any (heavy)","first trimester","206/11521 (2%)",NA
+"31","ALSPAC","Alcohol: any (heavy)","first two postnatal years","1215/11337 (11%)","2142/8603 (25%)"
+"32","ALSPAC","Alcohol: any (heavy)","preconception","1308/11549 (11%)","2056/8861 (23%)"
+"33","ALSPAC","Alcohol: any (heavy)","second trimester","152/11307 (1%)","1773/8745 (20%)"
+"34","ALSPAC","Alcohol: any (heavy)","third trimester","195/10843 (2%)","1419/7818 (18%)"
+"35","ALSPAC","Alcohol: any (light)","first trimester","4525/11521 (39%)",NA
+"36","ALSPAC","Alcohol: any (light)","first two postnatal years","4740/11337 (42%)","2038/8603 (24%)"
+"37","ALSPAC","Alcohol: any (light)","preconception","4362/11549 (38%)","1859/8861 (21%)"
+"38","ALSPAC","Alcohol: any (light)","second trimester","3974/11307 (35%)","2092/8745 (24%)"
+"39","ALSPAC","Alcohol: any (light)","third trimester","3718/10843 (34%)","2042/7818 (26%)"
+"40","ALSPAC","Alcohol: any (moderate)","first trimester","1611/11521 (14%)",NA
+"41","ALSPAC","Alcohol: any (moderate)","first two postnatal years","4080/11337 (36%)","4003/8603 (47%)"
+"42","ALSPAC","Alcohol: any (moderate)","preconception","4992/11549 (43%)","4632/8861 (52%)"
+"43","ALSPAC","Alcohol: any (moderate)","second trimester","1571/11307 (14%)","4471/8745 (51%)"
+"44","ALSPAC","Alcohol: any (moderate)","third trimester","1664/10843 (15%)","3660/7818 (47%)"
+"45","ALSPAC","Caffeine: any source (any)","ever in pregnancy","11445/11841 (97%)","8309/8600 (97%)"
+"46","ALSPAC","Caffeine: any source (any)","first trimester","3197/3533 (90%)",NA
+"47","ALSPAC","Caffeine: any source (any)","first two postnatal years","7303/7904 (92%)",NA
+"48","ALSPAC","Caffeine: any source (any)","preconception","-Inf/-Inf (NaN%)",NA
+"49","ALSPAC","Caffeine: any source (any)","second trimester","10699/11583 (92%)","8309/8600 (97%)"
+"50","ALSPAC","Caffeine: any source (any)","third trimester","10843/11556 (94%)",NA
+"51","ALSPAC","Caffeine: any source (heavy)","first trimester","92/3533 (3%)",NA
+"52","ALSPAC","Caffeine: any source (heavy)","first two postnatal years","310/7904 (4%)",NA
+"53","ALSPAC","Caffeine: any source (heavy)","preconception","-Inf/-Inf (NaN%)",NA
+"54","ALSPAC","Caffeine: any source (heavy)","second trimester","351/11583 (3%)","912/8600 (11%)"
+"55","ALSPAC","Caffeine: any source (heavy)","third trimester","340/11556 (3%)",NA
+"56","ALSPAC","Caffeine: any source (light)","first trimester","2384/3533 (67%)",NA
+"57","ALSPAC","Caffeine: any source (light)","first two postnatal years","4951/7904 (63%)",NA
+"58","ALSPAC","Caffeine: any source (light)","preconception","-Inf/-Inf (NaN%)",NA
+"59","ALSPAC","Caffeine: any source (light)","second trimester","7525/11583 (65%)","3837/8600 (45%)"
+"60","ALSPAC","Caffeine: any source (light)","third trimester","7579/11556 (66%)",NA
+"61","ALSPAC","Caffeine: any source (moderate)","first trimester","721/3533 (20%)",NA
+"62","ALSPAC","Caffeine: any source (moderate)","first two postnatal years","2042/7904 (26%)",NA
+"63","ALSPAC","Caffeine: any source (moderate)","preconception","-Inf/-Inf (NaN%)",NA
+"64","ALSPAC","Caffeine: any source (moderate)","second trimester","2823/11583 (24%)","3560/8600 (41%)"
+"65","ALSPAC","Caffeine: any source (moderate)","third trimester","2924/11556 (25%)",NA
+"66","ALSPAC","Smoking: passive (any)","ever in pregnancy","6169/10027 (62%)",NA
+"67","ALSPAC","Alcohol: binge (any)","ever in pregnancy","2609/8724 (30%)","7220/8821 (82%)"
+"68","ALSPAC","Alcohol: binge (any)","first trimester","1930/11485 (17%)",NA
+"69","ALSPAC","Alcohol: binge (any)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"70","ALSPAC","Alcohol: binge (any)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"71","ALSPAC","Alcohol: binge (any)","third trimester","1463/8298 (18%)",NA
+"72","ALSPAC","Low SEP: education (any)","at study recruitment","2305/11814 (20%)","2732/11181 (24%)"
+"73","ALSPAC","Low SEP: occupation (any)","at study recruitment","1166/9643 (12%)","1336/10482 (13%)"
+"74","BIB","Smoking: active (any)","early onset","211/3248 (6%)","-Inf/-Inf (NaN%)"
+"75","BIB","Smoking: active (any)","ever in life","3303/10868 (30%)","-Inf/-Inf (NaN%)"
+"76","BIB","Smoking: active (any)","ever in pregnancy","1785/10868 (16%)","1009/3149 (32%)"
+"77","BIB","Smoking: active (any)","first trimester","1695/10383 (16%)","-Inf/-Inf (NaN%)"
+"78","BIB","Smoking: active (any)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"79","BIB","Smoking: active (any)","preconception","2164/10447 (21%)","-Inf/-Inf (NaN%)"
+"80","BIB","Smoking: active (any)","second trimester","1468/10363 (14%)","-Inf/-Inf (NaN%)"
+"81","BIB","Smoking: active (any)","third trimester","1468/10363 (14%)","1009/3149 (32%)"
+"82","BIB","Smoking: active (heavy)","first trimester","59/10383 (1%)","-Inf/-Inf (NaN%)"
+"83","BIB","Smoking: active (heavy)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"84","BIB","Smoking: active (heavy)","preconception","205/10447 (2%)","-Inf/-Inf (NaN%)"
+"85","BIB","Smoking: active (heavy)","second trimester","38/10363 (0%)","-Inf/-Inf (NaN%)"
+"86","BIB","Smoking: active (heavy)","third trimester","38/10363 (0%)","43/3148 (1%)"
+"87","BIB","Smoking: active (light)","first trimester","1324/10383 (13%)","-Inf/-Inf (NaN%)"
+"88","BIB","Smoking: active (light)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"89","BIB","Smoking: active (light)","preconception","1275/10447 (12%)","-Inf/-Inf (NaN%)"
+"90","BIB","Smoking: active (light)","second trimester","1203/10363 (12%)","-Inf/-Inf (NaN%)"
+"91","BIB","Smoking: active (light)","third trimester","1203/10363 (12%)","642/3148 (20%)"
+"92","BIB","Smoking: active (moderate)","first trimester","312/10383 (3%)","-Inf/-Inf (NaN%)"
+"93","BIB","Smoking: active (moderate)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"94","BIB","Smoking: active (moderate)","preconception","684/10447 (7%)","-Inf/-Inf (NaN%)"
+"95","BIB","Smoking: active (moderate)","second trimester","227/10363 (2%)","-Inf/-Inf (NaN%)"
+"96","BIB","Smoking: active (moderate)","third trimester","227/10363 (2%)","337/3148 (11%)"
+"97","BIB","Alcohol: any (any)","ever in pregnancy","2149/3296 (65%)","1532/3144 (49%)"
+"98","BIB","Alcohol: any (any)","first trimester","1653/3321 (50%)",NA
+"99","BIB","Alcohol: any (any)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"100","BIB","Alcohol: any (any)","preconception","3254/3316 (98%)","-Inf/-Inf (NaN%)"
+"101","BIB","Alcohol: any (any)","second trimester","1246/3287 (38%)","-Inf/-Inf (NaN%)"
+"102","BIB","Alcohol: any (any)","third trimester","1246/3287 (38%)","1532/3144 (49%)"
+"103","BIB","Alcohol: any (heavy)","first trimester","105/2211 (5%)",NA
+"104","BIB","Alcohol: any (heavy)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"105","BIB","Alcohol: any (heavy)","preconception","350/1693 (21%)","-Inf/-Inf (NaN%)"
+"106","BIB","Alcohol: any (heavy)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"107","BIB","Alcohol: any (heavy)","third trimester","-Inf/-Inf (NaN%)","382/1511 (25%)"
+"108","BIB","Alcohol: any (light)","first trimester","136/2211 (6%)",NA
+"109","BIB","Alcohol: any (light)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"110","BIB","Alcohol: any (light)","preconception","197/1693 (12%)","-Inf/-Inf (NaN%)"
+"111","BIB","Alcohol: any (light)","second trimester","121/2252 (5%)","-Inf/-Inf (NaN%)"
+"112","BIB","Alcohol: any (light)","third trimester","121/2252 (5%)","299/1511 (20%)"
+"113","BIB","Alcohol: any (moderate)","first trimester","289/2211 (13%)",NA
+"114","BIB","Alcohol: any (moderate)","first two postnatal years","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"115","BIB","Alcohol: any (moderate)","preconception","1049/1693 (62%)","-Inf/-Inf (NaN%)"
+"116","BIB","Alcohol: any (moderate)","second trimester","61/2252 (3%)","-Inf/-Inf (NaN%)"
+"117","BIB","Alcohol: any (moderate)","third trimester","61/2252 (3%)","807/1511 (53%)"
+"118","BIB","Caffeine: any source (any)","ever in pregnancy","7504/9176 (82%)","-Inf/-Inf (NaN%)"
+"119","BIB","Caffeine: any source (any)","first trimester","-Inf/-Inf (NaN%)",NA
+"120","BIB","Caffeine: any source (any)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"121","BIB","Caffeine: any source (any)","preconception","-Inf/-Inf (NaN%)",NA
+"122","BIB","Caffeine: any source (any)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"123","BIB","Caffeine: any source (any)","third trimester","7504/9176 (82%)",NA
+"124","BIB","Caffeine: any source (heavy)","first trimester","-Inf/-Inf (NaN%)",NA
+"125","BIB","Caffeine: any source (heavy)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"126","BIB","Caffeine: any source (heavy)","preconception","-Inf/-Inf (NaN%)",NA
+"127","BIB","Caffeine: any source (heavy)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"128","BIB","Caffeine: any source (heavy)","third trimester","350/9176 (4%)",NA
+"129","BIB","Caffeine: any source (light)","first trimester","-Inf/-Inf (NaN%)",NA
+"130","BIB","Caffeine: any source (light)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"131","BIB","Caffeine: any source (light)","preconception","-Inf/-Inf (NaN%)",NA
+"132","BIB","Caffeine: any source (light)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"133","BIB","Caffeine: any source (light)","third trimester","6244/9176 (68%)",NA
+"134","BIB","Caffeine: any source (moderate)","first trimester","-Inf/-Inf (NaN%)",NA
+"135","BIB","Caffeine: any source (moderate)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"136","BIB","Caffeine: any source (moderate)","preconception","-Inf/-Inf (NaN%)",NA
+"137","BIB","Caffeine: any source (moderate)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"138","BIB","Caffeine: any source (moderate)","third trimester","910/9176 (10%)",NA
+"139","BIB","Smoking: passive (any)","ever in pregnancy","3461/10825 (32%)",NA
+"140","BIB","Alcohol: binge (any)","ever in pregnancy","1111/1426 (78%)","-Inf/-Inf (NaN%)"
+"141","BIB","Alcohol: binge (any)","first trimester","976/1621 (60%)",NA
+"142","BIB","Alcohol: binge (any)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"143","BIB","Alcohol: binge (any)","second trimester","333/1252 (27%)","-Inf/-Inf (NaN%)"
+"144","BIB","Alcohol: binge (any)","third trimester","333/1252 (27%)",NA
+"145","BIB","Low SEP: education (any)","at study recruitment","3177/10861 (29%)","864/2891 (30%)"
+"146","BIB","Low SEP: occupation (any)","at study recruitment","-Inf/-Inf (NaN%)","599/2419 (25%)"
+"147","MCS","Smoking: active (any)","early onset","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"148","MCS","Smoking: active (any)","ever in life","5052/11293 (45%)","4219/8012 (53%)"
+"149","MCS","Smoking: active (any)","ever in pregnancy","2180/11290 (19%)","2624/7981 (33%)"
+"150","MCS","Smoking: active (any)","first trimester","2179/11289 (19%)","2624/7981 (33%)"
+"151","MCS","Smoking: active (any)","first two postnatal years","3022/11286 (27%)","2823/8002 (35%)"
+"152","MCS","Smoking: active (any)","preconception","2864/11286 (25%)","2708/7984 (34%)"
+"153","MCS","Smoking: active (any)","second trimester","2113/11288 (19%)","2608/7981 (33%)"
+"154","MCS","Smoking: active (any)","third trimester","2110/11289 (19%)","2602/7981 (33%)"
+"155","MCS","Smoking: active (heavy)","first trimester","358/11289 (3%)","799/7981 (10%)"
+"156","MCS","Smoking: active (heavy)","first two postnatal years","521/11286 (5%)","803/8002 (10%)"
+"157","MCS","Smoking: active (heavy)","preconception","884/11286 (8%)","1007/7984 (13%)"
+"158","MCS","Smoking: active (heavy)","second trimester","295/11288 (3%)","775/7981 (10%)"
+"159","MCS","Smoking: active (heavy)","third trimester","293/11289 (3%)","769/7981 (10%)"
+"160","MCS","Smoking: active (light)","first trimester","1131/11289 (10%)","758/7981 (9%)"
+"161","MCS","Smoking: active (light)","first two postnatal years","1176/11286 (10%)","833/8002 (10%)"
+"162","MCS","Smoking: active (light)","preconception","711/11286 (6%)","657/7984 (8%)"
+"163","MCS","Smoking: active (light)","second trimester","1193/11288 (11%)","781/7981 (10%)"
+"164","MCS","Smoking: active (light)","third trimester","1199/11289 (11%)","794/7981 (10%)"
+"165","MCS","Smoking: active (moderate)","first trimester","690/11289 (6%)","1067/7981 (13%)"
+"166","MCS","Smoking: active (moderate)","first two postnatal years","1325/11286 (12%)","1187/8002 (15%)"
+"167","MCS","Smoking: active (moderate)","preconception","1269/11286 (11%)","1044/7984 (13%)"
+"168","MCS","Smoking: active (moderate)","second trimester","625/11288 (6%)","1052/7981 (13%)"
+"169","MCS","Smoking: active (moderate)","third trimester","618/11289 (5%)","1039/7981 (13%)"
+"170","MCS","Alcohol: any (any)","ever in pregnancy","3269/11298 (29%)","-Inf/-Inf (NaN%)"
+"171","MCS","Alcohol: any (any)","first trimester","-Inf/-Inf (NaN%)",NA
+"172","MCS","Alcohol: any (any)","first two postnatal years","7965/11299 (70%)","6651/8164 (81%)"
+"173","MCS","Alcohol: any (any)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"174","MCS","Alcohol: any (any)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"175","MCS","Alcohol: any (any)","third trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"176","MCS","Alcohol: any (heavy)","first trimester","-Inf/-Inf (NaN%)",NA
+"177","MCS","Alcohol: any (heavy)","first two postnatal years","296/11299 (3%)","678/8164 (8%)"
+"178","MCS","Alcohol: any (heavy)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"179","MCS","Alcohol: any (heavy)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"180","MCS","Alcohol: any (heavy)","third trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"181","MCS","Alcohol: any (light)","first trimester","-Inf/-Inf (NaN%)",NA
+"182","MCS","Alcohol: any (light)","first two postnatal years","3987/11299 (35%)","1743/8164 (21%)"
+"183","MCS","Alcohol: any (light)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"184","MCS","Alcohol: any (light)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"185","MCS","Alcohol: any (light)","third trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"186","MCS","Alcohol: any (moderate)","first trimester","-Inf/-Inf (NaN%)",NA
+"187","MCS","Alcohol: any (moderate)","first two postnatal years","3682/11299 (33%)","4230/8164 (52%)"
+"188","MCS","Alcohol: any (moderate)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"189","MCS","Alcohol: any (moderate)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"190","MCS","Alcohol: any (moderate)","third trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"191","MCS","Caffeine: any source (any)","ever in pregnancy","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"192","MCS","Caffeine: any source (any)","first trimester","-Inf/-Inf (NaN%)",NA
+"193","MCS","Caffeine: any source (any)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"194","MCS","Caffeine: any source (any)","preconception","-Inf/-Inf (NaN%)",NA
+"195","MCS","Caffeine: any source (any)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"196","MCS","Caffeine: any source (any)","third trimester","-Inf/-Inf (NaN%)",NA
+"197","MCS","Caffeine: any source (heavy)","first trimester","-Inf/-Inf (NaN%)",NA
+"198","MCS","Caffeine: any source (heavy)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"199","MCS","Caffeine: any source (heavy)","preconception","-Inf/-Inf (NaN%)",NA
+"200","MCS","Caffeine: any source (heavy)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"201","MCS","Caffeine: any source (heavy)","third trimester","-Inf/-Inf (NaN%)",NA
+"202","MCS","Caffeine: any source (light)","first trimester","-Inf/-Inf (NaN%)",NA
+"203","MCS","Caffeine: any source (light)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"204","MCS","Caffeine: any source (light)","preconception","-Inf/-Inf (NaN%)",NA
+"205","MCS","Caffeine: any source (light)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"206","MCS","Caffeine: any source (light)","third trimester","-Inf/-Inf (NaN%)",NA
+"207","MCS","Caffeine: any source (moderate)","first trimester","-Inf/-Inf (NaN%)",NA
+"208","MCS","Caffeine: any source (moderate)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"209","MCS","Caffeine: any source (moderate)","preconception","-Inf/-Inf (NaN%)",NA
+"210","MCS","Caffeine: any source (moderate)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"211","MCS","Caffeine: any source (moderate)","third trimester","-Inf/-Inf (NaN%)",NA
+"212","MCS","Smoking: passive (any)","ever in pregnancy","-Inf/-Inf (NaN%)",NA
+"213","MCS","Alcohol: binge (any)","ever in pregnancy","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"214","MCS","Alcohol: binge (any)","first trimester","-Inf/-Inf (NaN%)",NA
+"215","MCS","Alcohol: binge (any)","preconception","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"216","MCS","Alcohol: binge (any)","second trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"217","MCS","Alcohol: binge (any)","third trimester","-Inf/-Inf (NaN%)",NA
+"218","MCS","Low SEP: education (any)","at study recruitment","1953/10845 (18%)","1138/7811 (15%)"
+"219","MCS","Low SEP: occupation (any)","at study recruitment","1367/4957 (28%)","1738/7104 (24%)"
+"220","MOBA","Smoking: active (any)","early onset","173/40723 (0%)","-Inf/-Inf (NaN%)"
+"221","MOBA","Smoking: active (any)","ever in life","47230/95837 (49%)","38778/74338 (52%)"
+"222","MOBA","Smoking: active (any)","ever in pregnancy","9512/83933 (11%)","26918/95050 (28%)"
+"223","MOBA","Smoking: active (any)","first trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"224","MOBA","Smoking: active (any)","first two postnatal years","11070/86995 (13%)","16634/84934 (20%)"
+"225","MOBA","Smoking: active (any)","preconception","27953/87137 (32%)","30552/98971 (31%)"
+"226","MOBA","Smoking: active (any)","second trimester","8337/87862 (9%)","24268/98550 (25%)"
+"227","MOBA","Smoking: active (any)","third trimester","7415/95136 (8%)","21329/94785 (23%)"
+"228","MOBA","Smoking: active (heavy)","first trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"229","MOBA","Smoking: active (heavy)","first two postnatal years","658/86995 (1%)","3282/84934 (4%)"
+"230","MOBA","Smoking: active (heavy)","preconception","2920/86315 (3%)","3451/43554 (8%)"
+"231","MOBA","Smoking: active (heavy)","second trimester","90/87739 (0%)","1982/43234 (5%)"
+"232","MOBA","Smoking: active (heavy)","third trimester","243/95029 (0%)","3747/94268 (4%)"
+"233","MOBA","Smoking: active (light)","first trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"234","MOBA","Smoking: active (light)","first two postnatal years","5829/86995 (7%)","5444/84934 (6%)"
+"235","MOBA","Smoking: active (light)","preconception","15270/86315 (18%)","10802/43554 (25%)"
+"236","MOBA","Smoking: active (light)","second trimester","6352/87739 (7%)","9314/43234 (22%)"
+"237","MOBA","Smoking: active (light)","third trimester","5047/95029 (5%)","8368/94268 (9%)"
+"238","MOBA","Smoking: active (moderate)","first trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"239","MOBA","Smoking: active (moderate)","first two postnatal years","4583/86995 (5%)","7908/84934 (9%)"
+"240","MOBA","Smoking: active (moderate)","preconception","8941/86315 (10%)","7566/43554 (17%)"
+"241","MOBA","Smoking: active (moderate)","second trimester","1772/87739 (2%)","5755/43234 (13%)"
+"242","MOBA","Smoking: active (moderate)","third trimester","2018/95029 (2%)","8697/94268 (9%)"
+"243","MOBA","Alcohol: any (any)","ever in pregnancy","25637/81163 (32%)","68807/71732 (96%)"
+"244","MOBA","Alcohol: any (any)","first trimester","22672/81829 (28%)",NA
+"245","MOBA","Alcohol: any (any)","first two postnatal years","73770/87870 (84%)","-Inf/-Inf (NaN%)"
+"246","MOBA","Alcohol: any (any)","preconception","90370/98500 (92%)","70803/72434 (98%)"
+"247","MOBA","Alcohol: any (any)","second trimester","8426/79285 (11%)","68807/71732 (96%)"
+"248","MOBA","Alcohol: any (any)","third trimester","8514/79395 (11%)","-Inf/-Inf (NaN%)"
+"249","MOBA","Alcohol: any (heavy)","first trimester","23/81829 (0%)",NA
+"250","MOBA","Alcohol: any (heavy)","first two postnatal years","115/87870 (0%)","-Inf/-Inf (NaN%)"
+"251","MOBA","Alcohol: any (heavy)","preconception","259/98500 (0%)","382/72434 (1%)"
+"252","MOBA","Alcohol: any (heavy)","second trimester","-Inf/-Inf (NaN%)","241/71732 (0%)"
+"253","MOBA","Alcohol: any (heavy)","third trimester","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"254","MOBA","Alcohol: any (light)","first trimester","22008/81829 (27%)",NA
+"255","MOBA","Alcohol: any (light)","first two postnatal years","67186/87870 (76%)","-Inf/-Inf (NaN%)"
+"256","MOBA","Alcohol: any (light)","preconception","80058/98500 (81%)","57305/72434 (79%)"
+"257","MOBA","Alcohol: any (light)","second trimester","8332/79285 (11%)","59015/71732 (82%)"
+"258","MOBA","Alcohol: any (light)","third trimester","8420/79395 (11%)","-Inf/-Inf (NaN%)"
+"259","MOBA","Alcohol: any (moderate)","first trimester","641/81829 (1%)",NA
+"260","MOBA","Alcohol: any (moderate)","first two postnatal years","6469/87870 (7%)","-Inf/-Inf (NaN%)"
+"261","MOBA","Alcohol: any (moderate)","preconception","10053/98500 (10%)","13116/72434 (18%)"
+"262","MOBA","Alcohol: any (moderate)","second trimester","91/79285 (0%)","9551/71732 (13%)"
+"263","MOBA","Alcohol: any (moderate)","third trimester","91/79395 (0%)","-Inf/-Inf (NaN%)"
+"264","MOBA","Caffeine: any source (any)","ever in pregnancy","74276/88073 (84%)","32362/33470 (97%)"
+"265","MOBA","Caffeine: any source (any)","first trimester","-Inf/-Inf (NaN%)",NA
+"266","MOBA","Caffeine: any source (any)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"267","MOBA","Caffeine: any source (any)","preconception","85577/90093 (95%)",NA
+"268","MOBA","Caffeine: any source (any)","second trimester","74276/88073 (84%)","32362/33470 (97%)"
+"269","MOBA","Caffeine: any source (any)","third trimester","-Inf/-Inf (NaN%)",NA
+"270","MOBA","Caffeine: any source (heavy)","first trimester","-Inf/-Inf (NaN%)",NA
+"271","MOBA","Caffeine: any source (heavy)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"272","MOBA","Caffeine: any source (heavy)","preconception","6456/90093 (7%)",NA
+"273","MOBA","Caffeine: any source (heavy)","second trimester","823/88073 (1%)","455/33470 (1%)"
+"274","MOBA","Caffeine: any source (heavy)","third trimester","-Inf/-Inf (NaN%)",NA
+"275","MOBA","Caffeine: any source (light)","first trimester","-Inf/-Inf (NaN%)",NA
+"276","MOBA","Caffeine: any source (light)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"277","MOBA","Caffeine: any source (light)","preconception","54443/90093 (60%)",NA
+"278","MOBA","Caffeine: any source (light)","second trimester","66812/88073 (76%)","21259/33470 (64%)"
+"279","MOBA","Caffeine: any source (light)","third trimester","-Inf/-Inf (NaN%)",NA
+"280","MOBA","Caffeine: any source (moderate)","first trimester","-Inf/-Inf (NaN%)",NA
+"281","MOBA","Caffeine: any source (moderate)","first two postnatal years","-Inf/-Inf (NaN%)",NA
+"282","MOBA","Caffeine: any source (moderate)","preconception","24678/90093 (27%)",NA
+"283","MOBA","Caffeine: any source (moderate)","second trimester","6641/88073 (8%)","10648/33470 (32%)"
+"284","MOBA","Caffeine: any source (moderate)","third trimester","-Inf/-Inf (NaN%)",NA
+"285","MOBA","Smoking: passive (any)","ever in pregnancy","6214/91738 (7%)",NA
+"286","MOBA","Alcohol: binge (any)","ever in pregnancy","10777/76132 (14%)","11028/16889 (65%)"
+"287","MOBA","Alcohol: binge (any)","first trimester","10594/77591 (14%)",NA
+"288","MOBA","Alcohol: binge (any)","preconception","54400/88456 (61%)","15053/18580 (81%)"
+"289","MOBA","Alcohol: binge (any)","second trimester","472/74417 (1%)","11028/16889 (65%)"
+"290","MOBA","Alcohol: binge (any)","third trimester","418/74314 (1%)",NA
+"291","MOBA","Low SEP: education (any)","at study recruitment","2686/94035 (3%)","4649/95606 (5%)"
+"292","MOBA","Low SEP: occupation (any)","at study recruitment","-Inf/-Inf (NaN%)","-Inf/-Inf (NaN%)"
+"293","Total","Smoking: active (any)","early onset","534/63488 (1%)","300/15118 (2%)"
+"294","Total","Smoking: active (any)","ever in life","61339/191515 (32%)","47806/150539 (32%)"
+"295","Total","Smoking: active (any)","ever in pregnancy","16519/141666 (12%)","33989/161210 (21%)"
+"296","Total","Smoking: active (any)","first trimester","6584/41343 (16%)","2624/12662 (21%)"
+"297","Total","Smoking: active (any)","first two postnatal years","16897/156413 (11%)","21579/149930 (14%)"
+"298","Total","Smoking: active (any)","preconception","36742/159830 (23%)","37446/171220 (22%)"
+"299","Total","Smoking: active (any)","second trimester","13821/139494 (10%)","29345/158243 (19%)"
+"300","Total","Smoking: active (any)","third trimester","13406/154957 (9%)","27049/158005 (17%)"
+"301","Total","Smoking: active (heavy)","first trimester","826/35625 (2%)","799/11024 (7%)"
+"302","Total","Smoking: active (heavy)","first two postnatal years","1875/141989 (1%)","4840/133599 (4%)"
+"303","Total","Smoking: active (heavy)","preconception","5089/132939 (4%)","5930/81135 (7%)"
+"304","Total","Smoking: active (heavy)","second trimester","687/128330 (1%)","3557/73615 (5%)"
+"305","Total","Smoking: active (heavy)","third trimester","974/143900 (1%)","5314/138065 (4%)"
+"306","Total","Smoking: active (light)","first trimester","3667/38438 (10%)","758/10969 (7%)"
+"307","Total","Smoking: active (light)","first two postnatal years","7887/147796 (5%)","6789/135519 (5%)"
+"308","Total","Smoking: active (light)","preconception","18237/143825 (13%)","12563/87098 (14%)"
+"309","Total","Smoking: active (light)","second trimester","9616/136089 (7%)","10805/80021 (14%)"
+"310","Total","Smoking: active (light)","third trimester","8466/150680 (6%)","10242/142339 (7%)"
+"311","Total","Smoking: active (moderate)","first trimester","2091/36886 (6%)","1067/11261 (9%)"
+"312","Total","Smoking: active (moderate)","first two postnatal years","7135/147068 (5%)","9950/138634 (7%)"
+"313","Total","Smoking: active (moderate)","preconception","12498/139056 (9%)","10112/84822 (12%)"
+"314","Total","Smoking: active (moderate)","second trimester","3395/131588 (3%)","7766/77309 (10%)"
+"315","Total","Smoking: active (moderate)","third trimester","3859/147472 (3%)","10989/143407 (8%)"
+"316","Total","Alcohol: any (any)","ever in pregnancy","39165/162086 (24%)","81190/172635 (47%)"
+"317","Total","Alcohol: any (any)","first trimester","30667/142683 (21%)",NA
+"318","Total","Alcohol: any (any)","first two postnatal years","91679/232139 (39%)","14748/37773 (39%)"
+"319","Total","Alcohol: any (any)","preconception","104286/225786 (46%)","79350/167752 (47%)"
+"320","Total","Alcohol: any (any)","second trimester","15369/125438 (12%)","77143/164924 (47%)"
+"321","Total","Alcohol: any (any)","third trimester","15283/125133 (12%)","8582/20295 (42%)"
+"322","Total","Alcohol: any (heavy)","first trimester","334/114945 (0%)",NA
+"323","Total","Alcohol: any (heavy)","first two postnatal years","1618/143577 (1%)","2800/26517 (11%)"
+"324","Total","Alcohol: any (heavy)","preconception","1917/130846 (1%)","2438/98381 (2%)"
+"325","Total","Alcohol: any (heavy)","second trimester","152/17994 (1%)","2014/97059 (2%)"
+"326","Total","Alcohol: any (heavy)","third trimester","195/17619 (1%)","1789/14043 (13%)"
+"327","Total","Alcohol: any (light)","first trimester","26669/140087 (19%)",NA
+"328","Total","Alcohol: any (light)","first two postnatal years","75881/216838 (35%)","3759/27330 (14%)"
+"329","Total","Alcohol: any (light)","preconception","84617/205050 (41%)","59164/148962 (40%)"
+"330","Total","Alcohol: any (light)","second trimester","12427/123448 (10%)","61107/149876 (41%)"
+"331","Total","Alcohol: any (light)","third trimester","12222/122987 (10%)","2320/14666 (16%)"
+"332","Total","Alcohol: any (moderate)","first trimester","2541/117097 (2%)",NA
+"333","Total","Alcohol: any (moderate)","first two postnatal years","14180/155702 (9%)","8189/31508 (26%)"
+"334","Total","Alcohol: any (moderate)","preconception","16094/143367 (11%)","17748/112409 (16%)"
+"335","Total","Alcohol: any (moderate)","second trimester","1723/113164 (2%)","14022/108149 (13%)"
+"336","Total","Alcohol: any (moderate)","third trimester","1800/112971 (2%)","4429/16284 (27%)"
+"337","Total","Caffeine: any source (any)","ever in pregnancy","93225/209225 (45%)","40671/87231 (47%)"
+"338","Total","Caffeine: any source (any)","first trimester","3197/8860 (36%)",NA
+"339","Total","Caffeine: any source (any)","first two postnatal years","7303/19992 (37%)",NA
+"340","Total","Caffeine: any source (any)","preconception","85577/183797 (47%)",NA
+"341","Total","Caffeine: any source (any)","second trimester","84975/193891 (44%)","40671/87231 (47%)"
+"342","Total","Caffeine: any source (any)","third trimester","18347/39652 (46%)",NA
+"343","Total","Caffeine: any source (heavy)","first trimester","92/5765 (2%)",NA
+"344","Total","Caffeine: any source (heavy)","first two postnatal years","310/12999 (2%)",NA
+"345","Total","Caffeine: any source (heavy)","preconception","6456/107143 (6%)",NA
+"346","Total","Caffeine: any source (heavy)","second trimester","1174/118499 (1%)","1367/51862 (3%)"
+"347","Total","Caffeine: any source (heavy)","third trimester","690/22242 (3%)",NA
+"348","Total","Caffeine: any source (light)","first trimester","2384/8056 (30%)",NA
+"349","Total","Caffeine: any source (light)","first two postnatal years","4951/17640 (28%)",NA
+"350","Total","Caffeine: any source (light)","preconception","54443/152802 (36%)",NA
+"351","Total","Caffeine: any source (light)","second trimester","74337/184349 (40%)","25096/73074 (34%)"
+"352","Total","Caffeine: any source (light)","third trimester","13823/35187 (39%)",NA
+"353","Total","Caffeine: any source (moderate)","first trimester","721/6395 (11%)",NA
+"354","Total","Caffeine: any source (moderate)","first two postnatal years","2042/14731 (14%)",NA
+"355","Total","Caffeine: any source (moderate)","preconception","24678/123357 (20%)",NA
+"356","Total","Caffeine: any source (moderate)","second trimester","9464/126025 (8%)","14208/63461 (22%)"
+"357","Total","Caffeine: any source (moderate)","third trimester","3834/25339 (15%)",NA
+"358","Total","Smoking: passive (any)","ever in pregnancy","15844/136811 (12%)",NA
+"359","Total","Alcohol: binge (any)","ever in pregnancy","14497/116641 (12%)","18248/49587 (37%)"
+"360","Total","Alcohol: binge (any)","first trimester","13500/121866 (11%)",NA
+"361","Total","Alcohol: binge (any)","preconception","54400/154284 (35%)","15053/35496 (42%)"
+"362","Total","Alcohol: binge (any)","second trimester","805/88643 (1%)","11028/29619 (37%)"
+"363","Total","Alcohol: binge (any)","third trimester","2214/102972 (2%)",NA
+"364","Total","Low SEP: education (any)","at study recruitment","10121/144167 (7%)","9383/142289 (7%)"
+"365","Total","Low SEP: occupation (any)","at study recruitment","2533/23729 (11%)","3673/28572 (13%)"

@@ -5,7 +5,7 @@ require(reshape2)
 
 setwd("~/OneDrive - University of Exeter/Projects/EPoCH/")
 
-# correlate SEP with health behaviours
+# correlate SEP with health behaviours (have to update with moba)
 alspac <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/alspac/alspac_pheno.rds")
 bib <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/bib/bib_pheno.rds")
 mcs <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/mcs/mcs_pheno.rds")
@@ -49,6 +49,8 @@ ggplot(all_cor,aes(x=sep_parent,y=parent))+
   theme_minimal()+xlab("")+ylab("")+
   theme(strip.text.y=element_text(angle=0,hjust=0),ggh4x.facet.nestline = element_line())
 dev.off()
+
+
 ##
 
 dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/rds/all_results_reduced.rds")
@@ -115,8 +117,10 @@ write.csv(S4TS1,"~/OneDrive - University of Exeter/Projects/EPoCH/S4TS1.csv")
 table1_alspac <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/alspac.csv")
 table1_mcs <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/mcs.csv")
 table1_bib <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/bib.csv")
-cohorts <- list(table1_alspac,table1_bib,table1_mcs)
-names(cohorts)<-c("alspac","bib","mcs")
+table1_moba <- read.csv("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/cohorts/moba.csv")
+
+cohorts <- list(table1_alspac,table1_bib,table1_mcs,table1_moba)
+names(cohorts)<-c("alspac","bib","mcs","moba")
 S4TS2 <- bind_rows(cohorts,.id="cohort")
 S4TS2 <- S4TS2[grepl("mother|partner",S4TS2$variable)&grepl("binary",S4TS2$variable)&grepl("alcohol|caffeine|smoking|low sep",S4TS2$variable),] %>% group_by(paste(variable, level)) %>% summarise(ncohorts=length(total.n),n=sum(total.n)-sum(n.missing),nlevel=sum(n.in.level))
 S4TS2$pclevel <-100*(S4TS2$nlevel/S4TS2$n)
@@ -132,7 +136,7 @@ S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on education"]<-"low S
 S4TS2$exposure_class[S4TS2$exposure_class=="low sep based on occupation"]<-"low SEP"
 S4TS2$exposure_time<-factor(S4TS2$exposure_time,ordered=T,levels=c("education","occupation","ever in life","early onset (before age 12)","preconception","first trimester","second trimester","third trimester","ever in pregnancy","first two postnatal years"))
 
-pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Barchart.pdf",width=7.5,height=6.5)
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Barchart.pdf",width=7.5,height=6.5)
 
 ggplot(S4TS2,aes(x=exposure_time,y=pclevel))+
   geom_col(fill="aquamarine4")+
@@ -690,7 +694,7 @@ mt_m$exposure <- paste(mt_m$exposure_class2,mt_m$exposure_subclass,mt_m$exposure
 mt_m$outcome <- paste(mt_m$outcome_class,mt_m$outcome_subclass2,mt_m$outcome_time)
 mt_m$exposure_class <- factor(mt_m$exposure_class2, ordered=T, levels=c("Smoking","Alcohol consumption", "Caffeine consumption","Low SEP"))
 
-pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Coefficients.pdf",width=12,height=10)
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Coefficients.pdf",width=12,height=10)
 
 ggplot(mt_m,aes(y=outcome_subclass2,x=est_SDM,colour=hit_category))+
   geom_jitter(aes(alpha=as.numeric(hit_category)*0.25))+
@@ -715,7 +719,7 @@ dim(DIM[DIM$person_exposed=="partner",])
 dim(DIM[DIM$person_exposed=="mother"&DIM$fdr<0.05,])
 dim(DIM[DIM$person_exposed=="partner"&DIM$fdr<0.05,])
 
-source("OneDrive - University of Exeter/Projects/EPoCH/EPoCH analysis/triangulation.R")
+source("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH analysis/triangulation.R")
 
 T_mothers_preg <-triangulate_results(unstrat,"mother",c("ever in pregnancy"),"postnatal")
 T_partners_preg <-triangulate_results(unstrat,"partner",c("ever in pregnancy"),"postnatal")
@@ -729,7 +733,7 @@ T_mothers_precon_preg <-triangulate_results(unstrat,"mother","preconception","du
 T_partners_precon_preg <-triangulate_results(unstrat,"partner","preconception","during pregnancy")
 T_both_precon_preg<-combine_triang_results(T_mothers_precon_preg,T_partners_precon_preg)
 
-saveRDS(T_both_preg,"OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/triangulation/triangulation_pregnancy.rds")
+saveRDS(T_both_preg,"~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/triangulation/triangulation_pregnancy.rds")
 
 
 # plot
@@ -752,7 +756,7 @@ FDR_insig <- as.character(FDR_insig_w$Var1[FDR_insig_w$all_insig])
 
 data_to_plot <- droplevels(T_both_preg[(T_both_preg$outcome %in% FDR_insig)==F,])
 
-pdf(file = "OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Triangulation.pdf",width=10,height=17)
+pdf(file = "~/OneDrive - University of Exeter/Projects/EPoCH/Paper/Figures/Triangulation.pdf",width=10,height=17)
 
 ggplot(data_to_plot,aes(x=variable2,y=outcome_subclass))+
   geom_tile(aes(fill=factor(value)))+
@@ -778,9 +782,6 @@ T_both_preg[which(T_both_preg$value=="5 lines\nof evidence"),]->Pregnancy_outcom
 T_both_precon_preg[which(T_both_precon_preg$value=="5 lines\nof evidence"),]->Precon_Preg_outcomes
 T_both_precon_post[which(T_both_precon_post$value=="5 lines\nof evidence"),]->Postcon_Preg_outcomes
 
-# now compare these with effect of SEP to contextualise evidence
-
-apply(Pregnancy_outcomes,1,paste,collapse="_")[apply(Pregnancy_outcomes,1,function(x){paste(x,collapse="_") %in% apply(Prenatal_outcomes,1,paste,collapse="_")})]
 
 
 
