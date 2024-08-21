@@ -135,6 +135,8 @@ change_terminology <- function(oldterm,datatype,newterm){
   combined_cleaned
 }
 
+combined_cleaned <- change_terminology("BMI >25","binary","overweight or obese")
+combined_cleaned <- change_terminology("BMI >30","binary","obese")
 combined_cleaned <- change_terminology("autism","continuous","risk for ASD") ## can remove this one once this is changed in the original data
 combined_cleaned <- change_terminology("autism","binary","risk for ASD > CT")
 combined_cleaned <- change_terminology("total difficulties (SDQ)","binary","total difficulties (SDQ) >=17")

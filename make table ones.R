@@ -1,7 +1,7 @@
 require(dplyr)
 
 # TABLE ONES
-moba <- readRDS("/Volumes/MRC-IEU-research/projects/ieu2/p5/015/working/data/moba/results/table1_for_dat.rds")
+moba <- readRDS("/Users/gcs215/OneDrive - University of Exeter/Projects/EPoCH/EPoCH analysis/data_prep/cohorts/moba/table1_for_dat.rds")
 mcs <- readRDS("~/University of Bristol/grp-EPoCH - Documents/EPoCH GitHub/data_prep/check_prepared_data/table1_for_dat_MCS.rds")
 alspac <- readRDS("~/University of Bristol/grp-EPoCH - Documents/EPoCH GitHub/data_prep/check_prepared_data/table1_for_dat_ALSPAC.rds")
 bib <- readRDS("~/University of Bristol/grp-EPoCH - Documents/EPoCH GitHub/data_prep/check_prepared_data/table1_for_dat_BIB.rds")
@@ -19,9 +19,9 @@ Both <- full_join(Cat,Cont, by = intersect(colnames(Cat), colnames(Cont)))
 Both
 }
 
-cohorts <- list(alspac,bib,mcs)
+cohorts <- list(alspac,bib,mcs,moba)
 prepared_cohorts <- lapply(cohorts,prepareTables)
-names(prepared_cohorts) <- c("alspac","bib","mcs")
+names(prepared_cohorts) <- c("alspac","bib","mcs","moba")
 
 key <- bind_rows(prepared_cohorts,.id = "cohort")
 key <- key[order(key$variable,key$level),]
@@ -63,5 +63,6 @@ cohorts_with_key <- lapply(prepared_cohorts,prepare_cohorts_with_key)
 write.csv(cohorts_with_key$alspac,"/Users/gcs215/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/EPoCH/EPoCH results app/data/cohorts/alspac.csv",row.names = F)
 write.csv(cohorts_with_key$mcs,"/Users/gcs215/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/EPoCH/EPoCH results app/data/cohorts/mcs.csv",row.names = F)
 write.csv(cohorts_with_key$bib,"/Users/gcs215/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/EPoCH/EPoCH results app/data/cohorts/bib.csv",row.names = F)
+write.csv(cohorts_with_key$moba,"/Users/gcs215/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/EPoCH/EPoCH results app/data/cohorts/moba.csv",row.names = F)
 
 
