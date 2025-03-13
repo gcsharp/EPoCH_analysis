@@ -611,9 +611,15 @@ res$exposure_class2[res$exposure_class=="low socioeconomic position"]<-"Low SEP"
 res$exposure_class2<- factor(res$exposure_class2,ordered=T,levels=c("Smoking","Alcohol consumption","Caffeine consumption","Low SEP"))
 
 ## Text for main body:
-res %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
-res[res$model=="model2b",] %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
-res[res$model=="model2b"&res$parent=="Either",] %>% group_by(category,exposure_class,parent) %>% summarise(mean(proportions,na.rm=T))
+res2 <- res[res$model=="model2b",] %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
+res2[res2$category=="abs(effect)>0.2 & FDR-adj P<0.05",] # e.g. "The percentage of model 2b results with D>0.2 and FDR-P<0.05 was 7% for mothers, compared to 5% for partners."
+res2 <- res[res$model=="model2a",] %>% group_by(category,parent) %>% summarise(mean(proportions,na.rm=T))
+res2[res2$category=="abs(effect)>0.2 & FDR-adj P<0.05",] # e.g. "The percentage of model 2a results with D>0.2 and FDR-P<0.05 was X% for mothers, compared to X% for partners."
+
+
+res3 <- res[res$model=="model2b"&res$parent=="Either",] %>% group_by(category,exposure_class,parent) %>% summarise(mean(proportions,na.rm=T))
+res3[res3$category=="abs(effect)>0.2 & FDR-adj P<0.05",] # e.g. "Across all outcomes, the strongest associations were seen with low SEP: 15% of the results for low SEP had D>0.2 and FDR-P<0.05, compared to 6% for smoking, 3% for alcohol, and 0.4% for caffeine. "
+
 prop.table(table(unstrat$hit_category[unstrat$model=="model2b"&unstrat$exposure_time3=="GRS"]))
 
 # Creating MatPat (df containing maternal and corresponding paternal analysis in wide format)
@@ -625,6 +631,12 @@ matpat$samedir <- sign(matpat$estmat)==sign(matpat$estpat)
 matpat$samedir_diff <- abs(matpat$estmat) - abs(matpat$estpat)
 matpat$samedir_diff[matpat$samedir==F]<-NA
 matpat$samedir_pc_change <- (abs(matpat$samedir_diff)/abs(matpat$estmat))*100
+
+## mat vs pat effect size and p value and sample size
+# e.g. "for model 2b, 51% of analyses had a larger effect estimate for mothers than partners, and 52% had a smaller p-value for mothers than partners."
+prop.table(table(abs(matpat$estmat[matpat$model=="model2b"]) > abs(matpat$estpat[matpat$model=="model2b"])))
+prop.table(table(abs(matpat$pmat[matpat$model=="model2b"]) < abs(matpat$ppat[matpat$model=="model2b"])))
+prop.table(table(abs(matpat$total_nmat[matpat$model=="model2b"]) > abs(matpat$total_npat[matpat$model=="model2b"])))
 
 # Correlating maternal and paternal effects
 
@@ -713,7 +725,8 @@ dev.off()
 
 # triangulation with heatmap DURING PREGNANCY
 
-DIM <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$exposure_time%in%c("ever in pregnancy","first trimester","second trimester","third trimester")&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
+## for introductory text on n hits for model 2b:
+DIM <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$exposure_time%in%c("ever in pregnancy","first trimester","second trimester","third trimester")&unstrat$model=="model2b",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
 dim(DIM[DIM$person_exposed=="mother",])
 dim(DIM[DIM$person_exposed=="partner",])
 dim(DIM[DIM$person_exposed=="mother"&DIM$fdr<0.05,])
@@ -783,6 +796,28 @@ T_both_precon_preg[which(T_both_precon_preg$value=="5 lines\nof evidence"),]->Pr
 T_both_precon_post[which(T_both_precon_post$value=="5 lines\nof evidence"),]->Postcon_Preg_outcomes
 
 
+# compare to SEP for triangulated results
 
+unstrat$outcome_subclass_time <- paste0(unstrat$outcome_subclass2," at ",unstrat$outcome_time)
 
+HB <- unstrat[unstrat$outcome_subclass_time %in% Pregnancy_outcomes$outcome_subclass &
+                unstrat$model == "model2a"&
+                unstrat$exposure_subclass %in% c("active smoking","any drinking","any source")&
+                unstrat$exposure_time=="ever in pregnancy",]
+
+Pregnancy_outcomes_HB <- merge(Pregnancy_outcomes,HB[,c("outcome_subclass_time","person_exposed","exposure_class","est","se","p")],by.x=c("outcome_subclass","parent","exposure"),by.y=c("outcome_subclass_time","person_exposed","exposure_class"),all.x=T,all.y=F,suffixes = "hb")
+
+Edu <- unstrat[unstrat$exposure_subclass=="low SEP (education)"&
+                 unstrat$model == "model2a" &
+                 unstrat$outcome_subclass_time %in% Pregnancy_outcomes$outcome_subclass,]
+
+Ocu <- unstrat[unstrat$exposure_subclass=="low SEP (occupation)"&
+                 unstrat$model == "model2a" &
+                 unstrat$outcome_subclass_time %in% Pregnancy_outcomes$outcome_subclass,]
+
+Pregnancy_outcomes_SEP <- merge(Pregnancy_outcomes_HB,Edu[,c("outcome_subclass_time","person_exposed","est","se","p")],by.x=c("outcome_subclass","parent"),by.y=c("outcome_subclass_time","person_exposed"),all.x=T,all.y=F,suffixes = c("_hb","_edu"))
+Pregnancy_outcomes_SEP <- merge(Pregnancy_outcomes_SEP,Ocu[,c("outcome_subclass_time","person_exposed","est","se","p")],by.x=c("outcome_subclass","parent"),by.y=c("outcome_subclass_time","person_exposed"),all.x=T,all.y=F,suffixes = "ocu")
+
+Pregnancy_outcomes_SEP$HB_stronger <- abs(Pregnancy_outcomes_SEP$est_hb) > apply(data.frame(abs(Pregnancy_outcomes_SEP$est_edu),abs(Pregnancy_outcomes_SEP$est)),1,max,na.rm = T)
+Pregnancy_outcomes_SEP[Pregnancy_outcomes_SEP$HB_stronger==T,]
 

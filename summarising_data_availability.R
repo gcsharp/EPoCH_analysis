@@ -1,4 +1,5 @@
-dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH analysis/all_results_reduced.rds")
+
+dat <- readRDS("~/OneDrive - University of Exeter/Projects/EPoCH/EPoCH results app/data/rds/all_results_reduced.rds")
 require(ggplot2)
 require(ggh4x)
 
@@ -44,9 +45,11 @@ tb$present2[tb$present==F]<-"not available"
 tb$x<-factor(tb$x,ordered=T,levels=c("delivery","first year","age 1 to 2","age 3 to 4","age 5 to 7","age 8 to 11","any time in childhood"))
 tb->outcome_tb
 
+pdf("~/OneDrive - University of Exeter/Projects/EPoCH/data_availability_outcomes.pdf",width = 10,height = 15)
 ggplot(outcome_tb,aes(x=x,y=y,fill=present2))+
   geom_tile(colour="white")+
   scale_fill_manual(values=c("aquamarine3","grey50"))+
   facet_nested(outcome_class~cohort,scales = "free_y",space = "free_y")+
   theme(axis.text.x=element_text(angle=90,hjust=1),axis.title=element_blank(),
         strip.text.y=element_text(angle=0,hjust=0),legend.title=element_blank(),legend.position = "bottom")
+dev.off()

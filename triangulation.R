@@ -26,9 +26,7 @@ matpat$Z_p <- apply(matpat[,c("estmat","estpat","semat","sepat")],1,function(x){
   Z_test(beta_poi=as.numeric(x[1]),beta_cop=as.numeric(x[2]),se_poi=as.numeric(x[3]),se_cop=as.numeric(x[4]))})
 
 ## MVR
-top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
-
-#top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$fdr<0.05&unstrat$model=="model2a",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2a for MVR,obs unstrata only
+top_hits_2a <- unstrat[unstrat$exposure_subclass!="genetic risk score"&unstrat$model=="model2b",c("person_exposed","exposure_class","exposure_subclass","exposure_time","exposure_type","exposure_dose","outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type","est","se","p","i2","hetp","cohorts","cohorts_n","total_n","fdr")] #model 2b for MVR,obs unstrata only
 top_hits_2a$combination <- apply(top_hits_2a[,c("outcome_class","outcome_subclass1","outcome_subclass2","outcome_time","outcome_type")],
                                  1,paste,collapse="_")
 top_hits_2a_m <- top_hits_2a[top_hits_2a$person_exposed==parent&top_hits_2a$exposure_time%in%timing&top_hits_2a$exposure_type%in%c("continuous","binary"),]
@@ -80,7 +78,7 @@ heavylight <- merge(heavy,light,by=c("exposure_class","exposure_subclass","expos
 heavylight$diff <- abs(heavylight$estheavy) - abs(heavylight$estlight)
 heavylight$pc_change <- (abs(heavylight$diff)/abs(heavylight$estheavy))*100
 
-top_hits_dose_m <- heavylight[heavylight$exposure_subclass!="genetic risk score"&heavylight$pheavy<0.05&heavylight$diff>0 & heavylight$model=="model2a" &heavylight$person_exposed==parent,] #heavy>light, model2a
+top_hits_dose_m <- heavylight[heavylight$exposure_subclass!="genetic risk score"&heavylight$pheavy<0.05&heavylight$diff>0 & heavylight$model=="model2b" &heavylight$person_exposed==parent,] #heavy>light, model2a
 top_hits_dose_m$combination <- apply(top_hits_dose_m[,c("outcome_classheavy","outcome_subclass1heavy","outcome_subclass2heavy","outcome_timeheavy","outcome_typeheavy")],
                                      1,paste,collapse="_")
 top_hits_dose_m <- top_hits_dose_m[top_hits_dose_m$exposure_time%in%c("first trimester","second trimester","third trimester"),]
@@ -106,19 +104,19 @@ tdat_a <- merge(tdat_a,tdat_a_dose,by="outcome",all.x=T,all.y=T)
 tdat_c <- merge(tdat_c,tdat_c_dose,by="outcome",all.x=T,all.y=T)
 
 ## TIMING (comparing the time of interest to postnatal or during pregnancy)
-ModelTime <- "model2a"
+ModelTime <- "model2b"
 #if(any(timing%in%"preconception")){ModelTime <- "model2a"} #take the model adjusted for previous timepoints (3a), but if timing==preconception, there is no previous timepoint, so take model2a for that one
 timeofinterest <- unstrat[which(unstrat$exposure_time%in%timing&unstrat$model==ModelTime),]
 
 ComparisonTime <-c("ever in pregnancy","first trimester","second trimester","third trimester")
 if(any(comparisontiming%in%"postnatal")){ComparisonTime <- "first two postnatal years"} #comparison time is during pregnancy or postnatal
-ModelComparisonTime <-"model3a"
+ModelComparisonTime <-"model3b"
 comparisontime <- unstrat[which(unstrat$exposure_time==ComparisonTime&unstrat$model==ModelComparisonTime),]
 
 timeofinterestcomparisontime <- merge(timeofinterest,comparisontime,by=c("exposure_class","exposure_subclass","exposure_dose","exposure_type", "person_exposed","outcome_linker"),all=T,suffixes = c("timeofinterest","comparisontime"))
 timeofinterestcomparisontime$diff <- abs(timeofinterestcomparisontime$esttimeofinterest) - abs(timeofinterestcomparisontime$estcomparisontime)
 timeofinterestcomparisontime$pc_change <- (abs(timeofinterestcomparisontime$diff)/abs(timeofinterestcomparisontime$esttimeofinterest))*100
-top_hits_time_m <- timeofinterestcomparisontime[which(timeofinterestcomparisontime$exposure_subclass!="genetic risk score"& timeofinterestcomparisontime$ptimeofinterest<0.05&timeofinterestcomparisontime$diff>0 &timeofinterestcomparisontime$person_exposed==parent),] #timeofinterest>comparisontime, model3b
+top_hits_time_m <- timeofinterestcomparisontime[which(timeofinterestcomparisontime$exposure_subclass!="genetic risk score"& timeofinterestcomparisontime$ptimeofinterest<0.05&timeofinterestcomparisontime$diff>0 &timeofinterestcomparisontime$person_exposed==parent),] #timeofinterest>comparisontime, model3a
 top_hits_time_m$combination <- apply(top_hits_time_m[,c("outcome_classtimeofinterest","outcome_subclass1timeofinterest","outcome_subclass2timeofinterest","outcome_timetimeofinterest","outcome_typetimeofinterest")],
                                      1,paste,collapse="_")
 
@@ -153,7 +151,7 @@ matpat$poi_est <- matpat$estmat
   matpat$poi_est <- matpat$estpat
 }
 
-top_hits_negcon_m <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$poi_p<0.05 & matpat$samedir==T & matpat$poi_diff==T& matpat$model=="model2b" ,] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05, and P for diff between estimates Z_p<0.05.
+top_hits_negcon_m <- matpat[matpat$exposure_subclass!="genetic risk score"&matpat$poi_p<0.05 & matpat$samedir==T & matpat$poi_diff==T& matpat$model=="model2b" ,] #mutually adjusted model, mat>pat and in same dir, and matpat p<0.05, [and P for diff between estimates Z_p<0.05.]
 
 top_hits_negcon_m$combination <- apply(top_hits_negcon_m[,c("outcome_classmat","outcome_subclass1mat","outcome_subclass2mat","outcome_timemat","outcome_typemat")],
                                        1,paste,collapse="_")
